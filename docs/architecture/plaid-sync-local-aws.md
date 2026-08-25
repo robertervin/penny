@@ -6,6 +6,8 @@ Background work is **one Kubernetes deployment**: `penny-workflow-processor`. It
 
 Implementation lives in `services/workflow-processor`. This document is the contract; `scripts/dev/` bootstraps the local data plane.
 
+Product vocabulary (Situation vs Audit, jobs, Guidance): see [docs/terminology.md](../terminology.md).
+
 ---
 
 ## Target topology (local and AWS)

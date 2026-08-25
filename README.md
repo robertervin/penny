@@ -1,6 +1,10 @@
 # penny
 Your personal finance AI Assistant
 
+## Terminology
+
+Product and architecture vocabulary (client file, Situation, Audit vs Interpret, Guidance, etc.): [docs/terminology.md](docs/terminology.md).
+
 ## Local infrastructure (Kubernetes + EventBridge/SQS)
 
 Background work is one Kubernetes Deployment (`penny-workflow-processor`) that reads a single SQS queue and routes by event type. EventBridge → SQS is LocalStack locally and AWS later.
