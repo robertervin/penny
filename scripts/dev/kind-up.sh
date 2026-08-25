@@ -28,12 +28,16 @@ fi
 kubectl cluster-info --context "kind-${CLUSTER_NAME}" >/dev/null
 kubectl apply -f "${ROOT}/deploy/local/namespace.yaml"
 kubectl apply -f "${ROOT}/deploy/local/localstack.yaml"
+kubectl apply -f "${ROOT}/deploy/local/postgres.yaml"
 echo "waiting for LocalStack to be ready..."
 kubectl --context "kind-${CLUSTER_NAME}" -n penny rollout status deployment/localstack --timeout=180s
 kubectl --context "kind-${CLUSTER_NAME}" -n penny wait --for=condition=ready pod -l app=localstack --timeout=180s
+echo "waiting for Postgres to be ready..."
+kubectl --context "kind-${CLUSTER_NAME}" -n penny rollout status statefulset/postgres --timeout=180s
+kubectl --context "kind-${CLUSTER_NAME}" -n penny wait --for=condition=ready pod -l app=postgres --timeout=180s
 
 echo
-echo "Cluster is up. LocalStack NodePort is mapped to localhost:4566"
+echo "Cluster is up. LocalStack → localhost:4566, Postgres → localhost:5432"
 echo "Provision EventBridge/SQS/S3:"
 echo "  ./scripts/dev/provision-localstack.sh"
 echo

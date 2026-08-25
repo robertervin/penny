@@ -4,7 +4,7 @@ This is the implementation plan for vertical slice 1 (Plaid transactions + balan
 
 Background work is **one Kubernetes deployment**: `penny-workflow-processor`. It long-polls a single SQS queue, inspects each event’s **source, detail-type, and schema**, and dispatches to a registered workflow. Workflows do not talk to each other in-process as a hidden shortcut: when a workflow needs another, it `PutEvents` on EventBridge like any other producer.
 
-Application workflow code is **not** in this change. This document plus `scripts/dev/` are the contract and the machine setup.
+Implementation lives in `services/workflow-processor`. This document is the contract; `scripts/dev/` bootstraps the local data plane.
 
 ---
 
@@ -241,13 +241,13 @@ Sandbox egress from the cluster to `sandbox.plaid.com`.
 
 ---
 
-## Implementation order (code still later)
+## Implementation order
 
-1. Prereqs + kind + LocalStack provision (this repo slice).
-2. Postgres + schema.
-3. **`penny-workflow-processor`**: SQS consumer, envelope router, Plaid sync + ledger ingest modules.
-4. Link / webhook API `PutEvents`.
-5. AWS using the same event names and single queue.
+1. Prereqs + kind + LocalStack provision — done (`scripts/dev/`, `deploy/local/`).
+2. Postgres + schema — done (`deploy/local/postgres.yaml`, `migrations/001_init.sql`).
+3. **`penny-workflow-processor`** — done (`services/workflow-processor`): SQS consumer, envelope router, Plaid sync + ledger ingest (stub or live Plaid).
+4. Link / webhook API `PutEvents` — next.
+5. AWS EventBridge/SQS/EKS using the same event names — later.
 
 ---
 

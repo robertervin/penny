@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: workflow-processor-config
+  namespace: penny
+data:
+  AWS_REGION: "us-east-1"
+  AWS_ENDPOINT_URL: "http://localstack.penny.svc.cluster.local:4566"
+  AWS_ACCESS_KEY_ID: "test"
+  AWS_SECRET_ACCESS_KEY: "test"
+  EVENT_BUS_NAME: "penny"
+  PAYLOAD_BUCKET: "penny-plaid-snapshots"
+  PLAID_ENV: "sandbox"
+  PLAID_STUB: "true"
+  LOG_LEVEL: "info"
+  WORKER_CONCURRENCY: "2"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: workflow-processor-secrets
+  namespace: penny
+type: Opaque
+stringData:
+  DATABASE_URL: "postgres://penny:penny@postgres.penny.svc.cluster.local:5432/penny"
+  TOKEN_ENCRYPTION_KEY: "local-dev-only-not-for-prod"
+  # Set real values and PLAID_STUB=false to hit Plaid sandbox.
+  PLAID_CLIENT_ID: ""
+  PLAID_SECRET: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: penny-workflow-processor
+  namespace: penny
+  labels:
+    app: penny-workflow-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: penny-workflow-processor
+  template:
+    metadata:
+      labels:
+        app: penny-workflow-processor
+    spec:
+      containers:
+        - name: processor
+          image: penny-workflow-processor:local
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: workflow-processor-config
+            - secretRef:
+                name: workflow-processor-secrets
+          env:
+            # Queue URL is cluster-specific; provision script prints the LocalStack URL.
+            # For kind + LocalStack in-cluster, use the path-style queue URL LocalStack returns
+            # with the in-cluster hostname substituted via this value.
+            - name: WORKFLOW_QUEUE_URL
+              value: "http://localstack.penny.svc.cluster.local:4566/000000000000/penny-workflow"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi

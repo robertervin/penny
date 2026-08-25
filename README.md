@@ -13,4 +13,6 @@ Background work is one Kubernetes Deployment (`penny-workflow-processor`) that r
 ./scripts/dev/smoke-eventbridge.sh
 ```
 
-Details: [docs/architecture/plaid-sync-local-aws.md](docs/architecture/plaid-sync-local-aws.md) and [scripts/dev/README.md](scripts/dev/README.md).
+Processor service: [services/workflow-processor/README.md](services/workflow-processor/README.md)  
+Architecture: [docs/architecture/plaid-sync-local-aws.md](docs/architecture/plaid-sync-local-aws.md)  
+Scripts: [scripts/dev/README.md](scripts/dev/README.md)
