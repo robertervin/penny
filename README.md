@@ -1,2 +1,2 @@
 # penny
-Your AI assistant for your personal finances
+Your personal finance AI Assistant
