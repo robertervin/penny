@@ -3,7 +3,7 @@ Your personal finance AI Assistant
 
 ## Local infrastructure (Kubernetes + EventBridge/SQS)
 
-Workers will run in Kubernetes locally (kind) and later on EKS. Queues and routing are EventBridge → SQS locally via LocalStack, the same shape as AWS.
+Background work is one Kubernetes Deployment (`penny-workflow-processor`) that reads a single SQS queue and routes by event type. EventBridge → SQS is LocalStack locally and AWS later.
 
 ```bash
 ./scripts/dev/install-prereqs.sh

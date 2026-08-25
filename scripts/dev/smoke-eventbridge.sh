@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Put a PlaidSyncRequested event on the bus and confirm it lands on SQS.
+# Put a PlaidSyncRequested event on the bus and confirm it lands on penny-workflow.
 set -euo pipefail
 
 PENNY_BIN="${PENNY_BIN:-${HOME}/.local/bin}"
@@ -15,7 +15,7 @@ aws_ls() {
   aws --endpoint-url "${ENDPOINT}" --region "${AWS_REGION}" "$@"
 }
 
-SYNC_URL="$(aws_ls sqs get-queue-url --queue-name plaid-sync-requested --query QueueUrl --output text)"
+WORK_URL="$(aws_ls sqs get-queue-url --queue-name penny-workflow --query QueueUrl --output text)"
 EVENT_ID="$(uuidgen 2>/dev/null || python3 -c 'import uuid; print(uuid.uuid4())')"
 
 ENTRIES="$(cat <<EOF
@@ -32,5 +32,5 @@ EOF
 
 aws_ls events put-events --entries "${ENTRIES}"
 echo "put event_id=${EVENT_ID}"
-echo "polling plaid-sync-requested..."
-aws_ls sqs receive-message --queue-url "${SYNC_URL}" --wait-time-seconds 10 --max-number-of-messages 1
+echo "polling penny-workflow..."
+aws_ls sqs receive-message --queue-url "${WORK_URL}" --wait-time-seconds 10 --max-number-of-messages 1
