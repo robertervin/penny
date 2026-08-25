@@ -2,7 +2,7 @@
 
 Plan for user-defined classification rules and line-item drill-down, delivered lightweight over SMS (and MfB-shaped prototypes). Implements **Layer A + B + D** from the Corrections brainstorm, with **Layer E (web sheet)** deferred to a follow-on slice.
 
-**Status:** Planned (not implemented)  
+**Status:** Phase 1 implemented  
 **Depends on:** Interpret v1 (`situations` table, `HouseholdInterpretRequested`)  
 **Terminology:** [docs/terminology.md](../terminology.md) — Memory, Correction, Policy, Situation
 

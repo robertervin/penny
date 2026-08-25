@@ -106,11 +106,20 @@ type Status = {
     version: number;
     computedAt: string;
     runwayMonths: number | null;
+    operatingRunwayMonths: number | null;
     liquidCents: number | null;
     monthlyOutflowCents: number | null;
+    monthlyOperatingOutflowCents: number | null;
     monthlyInflowCents: number | null;
+    monthlyPayrollInflowCents: number | null;
     debtPosture: {
       revolvingBalanceCents?: number;
+    };
+    classified?: {
+      payrollInflowCents?: number;
+      operatingOutflowCents?: number;
+      debtServiceOutflowCents?: number;
+      ignoredCents?: number;
     };
   } | null;
 };
@@ -227,17 +236,26 @@ export default function App() {
                   <ul className="stats">
                     <li>
                       <strong>
-                        {status.situation.runwayMonths !== null
-                          ? `${status.situation.runwayMonths} mo`
-                          : "—"}
+                        {status.situation.operatingRunwayMonths !== null
+                          ? `${status.situation.operatingRunwayMonths} mo`
+                          : status.situation.runwayMonths !== null
+                            ? `${status.situation.runwayMonths} mo`
+                            : "—"}
                       </strong>{" "}
-                      runway
+                      operating runway
                     </li>
                     <li>
                       <strong>{formatUsd(status.situation.liquidCents)}</strong> liquid
                     </li>
                     <li>
-                      <strong>{formatUsd(status.situation.monthlyOutflowCents)}</strong>/mo out
+                      <strong>{formatUsd(status.situation.monthlyPayrollInflowCents)}</strong>
+                      /mo payroll
+                    </li>
+                    <li>
+                      <strong>
+                        {formatUsd(status.situation.monthlyOperatingOutflowCents)}
+                      </strong>
+                      /mo operating out
                     </li>
                   </ul>
                   {status.situation.debtPosture.revolvingBalanceCents ? (

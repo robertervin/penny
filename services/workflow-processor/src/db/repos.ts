@@ -435,6 +435,10 @@ export type SituationRow = {
   recurring_commitments: Record<string, unknown>;
   duplicate_candidates: unknown[];
   meta: Record<string, unknown>;
+  classified: Record<string, unknown>;
+  monthly_operating_outflow_cents: string | null;
+  monthly_payroll_inflow_cents: string | null;
+  operating_runway_months: string | null;
 };
 
 export async function getLedgerForInterpret(
@@ -469,14 +473,18 @@ export async function getLedgerForInterpret(
   );
 
   const { rows: txnRows } = await pool.query<{
+    plaid_transaction_id: string;
     account_id: string;
     account_type: string;
     amount_cents: string;
     pending: boolean;
     payment_channel: string | null;
     raw_name: string | null;
+    merchant_name: string | null;
+    posted_date: string;
   }>(
-    `SELECT t.account_id, a.type AS account_type, t.amount_cents, t.pending, t.payment_channel, t.raw_name
+    `SELECT t.plaid_transaction_id, t.account_id, a.type AS account_type, t.amount_cents,
+            t.pending, t.payment_channel, t.raw_name, t.merchant_name, t.posted_date::text
      FROM transactions t
      JOIN accounts a ON a.id = t.account_id
      WHERE a.household_id = $1
@@ -497,12 +505,15 @@ export async function getLedgerForInterpret(
       availableCents: r.available_cents !== null ? Number(r.available_cents) : null,
     })),
     transactions: txnRows.map((r) => ({
+      plaidTransactionId: r.plaid_transaction_id,
       accountId: r.account_id,
       accountType: r.account_type,
       amountCents: Number(r.amount_cents),
       pending: r.pending,
       paymentChannel: r.payment_channel,
       rawName: r.raw_name,
+      merchantName: r.merchant_name,
+      postedDate: r.posted_date,
     })),
   };
 }
@@ -518,12 +529,16 @@ export async function upsertSituation(
     liquidCents: number;
     monthlyOutflowCents: number;
     monthlyInflowCents: number;
+    monthlyOperatingOutflowCents: number;
+    monthlyPayrollInflowCents: number;
     runwayMonths: number | null;
+    operatingRunwayMonths: number | null;
     debtPosture: Record<string, unknown>;
     incomeShape: Record<string, unknown>;
     liquidityMap: Record<string, unknown>;
     recurringCommitments: Record<string, unknown>;
     duplicateCandidates: unknown[];
+    classified: Record<string, unknown>;
     meta: Record<string, unknown>;
   },
 ): Promise<void> {
@@ -531,9 +546,10 @@ export async function upsertSituation(
     `INSERT INTO situations (
        household_id, version, computed_at, trigger_event_id, sync_attempt_id,
        liquid_cents, monthly_outflow_cents, monthly_inflow_cents, runway_months,
+       monthly_operating_outflow_cents, monthly_payroll_inflow_cents, operating_runway_months,
        debt_posture, income_shape, liquidity_map, recurring_commitments,
-       duplicate_candidates, meta
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       duplicate_candidates, classified, meta
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
      ON CONFLICT (household_id) DO UPDATE SET
        version = EXCLUDED.version,
        computed_at = EXCLUDED.computed_at,
@@ -543,11 +559,15 @@ export async function upsertSituation(
        monthly_outflow_cents = EXCLUDED.monthly_outflow_cents,
        monthly_inflow_cents = EXCLUDED.monthly_inflow_cents,
        runway_months = EXCLUDED.runway_months,
+       monthly_operating_outflow_cents = EXCLUDED.monthly_operating_outflow_cents,
+       monthly_payroll_inflow_cents = EXCLUDED.monthly_payroll_inflow_cents,
+       operating_runway_months = EXCLUDED.operating_runway_months,
        debt_posture = EXCLUDED.debt_posture,
        income_shape = EXCLUDED.income_shape,
        liquidity_map = EXCLUDED.liquidity_map,
        recurring_commitments = EXCLUDED.recurring_commitments,
        duplicate_candidates = EXCLUDED.duplicate_candidates,
+       classified = EXCLUDED.classified,
        meta = EXCLUDED.meta,
        updated_at = now()`,
     [
@@ -560,11 +580,15 @@ export async function upsertSituation(
       row.monthlyOutflowCents,
       row.monthlyInflowCents,
       row.runwayMonths,
+      row.monthlyOperatingOutflowCents,
+      row.monthlyPayrollInflowCents,
+      row.operatingRunwayMonths,
       JSON.stringify(row.debtPosture),
       JSON.stringify(row.incomeShape),
       JSON.stringify(row.liquidityMap),
       JSON.stringify(row.recurringCommitments),
       JSON.stringify(row.duplicateCandidates),
+      JSON.stringify(row.classified),
       JSON.stringify(row.meta),
     ],
   );

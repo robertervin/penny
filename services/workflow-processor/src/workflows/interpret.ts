@@ -1,6 +1,7 @@
 import type { Config } from "../config/env.js";
 import type { AwsClients } from "../aws/clients.js";
 import type { Db } from "../db/pool.js";
+import { loadMemoryForHousehold } from "../db/memoryRepos.js";
 import {
   getLedgerForInterpret,
   getSituation,
@@ -15,7 +16,7 @@ import { computeSituation } from "../interpret/computeSituation.js";
 import type { Logger } from "../logger.js";
 import type { Workflow, WorkflowContext } from "./types.js";
 
-const INTERPRET_WINDOW_DAYS = 90;
+export const INTERPRET_WINDOW_DAYS = 90;
 
 export function createInterpretWorkflow(deps: {
   config: Config;
@@ -30,13 +31,11 @@ export function createInterpretWorkflow(deps: {
     schemaVersion: 1,
     async handle(envelope: EventEnvelope, ctx: WorkflowContext): Promise<void> {
       const detail = HouseholdInterpretRequestedDetailSchema.parse(envelope.detail);
-      const ledger = await getLedgerForInterpret(deps.pool, detail.household_id, INTERPRET_WINDOW_DAYS);
-
-      const metrics = computeSituation({
-        windowDays: INTERPRET_WINDOW_DAYS,
-        accounts: ledger.accounts,
-        transactions: ledger.transactions,
-      });
+      const metrics = await computeSituationForHousehold(
+        deps.pool,
+        detail.household_id,
+        INTERPRET_WINDOW_DAYS,
+      );
 
       const computedAt = new Date().toISOString();
       const existing = await getSituation(deps.pool, detail.household_id);
@@ -51,12 +50,16 @@ export function createInterpretWorkflow(deps: {
         liquidCents: metrics.liquidCents,
         monthlyOutflowCents: metrics.monthlyOutflowCents,
         monthlyInflowCents: metrics.monthlyInflowCents,
+        monthlyOperatingOutflowCents: metrics.monthlyOperatingOutflowCents,
+        monthlyPayrollInflowCents: metrics.monthlyPayrollInflowCents,
         runwayMonths: metrics.runwayMonths,
+        operatingRunwayMonths: metrics.operatingRunwayMonths,
         debtPosture: metrics.debtPosture,
         incomeShape: metrics.incomeShape,
         liquidityMap: metrics.liquidityMap,
         recurringCommitments: {},
         duplicateCandidates: [],
+        classified: metrics.classified,
         meta: metrics.meta,
       });
 
@@ -64,13 +67,32 @@ export function createInterpretWorkflow(deps: {
         {
           householdId: detail.household_id,
           version,
-          runwayMonths: metrics.runwayMonths,
-          liquidCents: metrics.liquidCents,
-          monthlyOutflowCents: metrics.monthlyOutflowCents,
+          operatingRunwayMonths: metrics.operatingRunwayMonths,
+          monthlyPayrollInflowCents: metrics.monthlyPayrollInflowCents,
+          monthlyOperatingOutflowCents: metrics.monthlyOperatingOutflowCents,
           correlationId: ctx.correlationId ?? detail.correlation_id,
         },
         "situation computed",
       );
     },
   };
+}
+
+export async function computeSituationForHousehold(
+  pool: Db,
+  householdId: string,
+  windowDays: number,
+) {
+  const [ledger, memory] = await Promise.all([
+    getLedgerForInterpret(pool, householdId, windowDays),
+    loadMemoryForHousehold(pool, householdId),
+  ]);
+
+  return computeSituation({
+    windowDays,
+    accounts: ledger.accounts,
+    transactions: ledger.transactions,
+    rules: memory.rules,
+    overrides: memory.overrides,
+  });
 }
