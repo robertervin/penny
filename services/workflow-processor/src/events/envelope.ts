@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 export const SOURCE_PLAID = "penny.plaid" as const;
+export const SOURCE_HOUSEHOLD = "penny.household" as const;
 
 export const DETAIL_PLAID_SYNC_REQUESTED = "PlaidSyncRequested" as const;
 export const DETAIL_PLAID_SNAPSHOT_READY = "PlaidSnapshotReady" as const;
+export const DETAIL_HOUSEHOLD_INTERPRET_REQUESTED = "HouseholdInterpretRequested" as const;
+export const DETAIL_HOUSEHOLD_INTERPRET_COMPLETED = "HouseholdInterpretCompleted" as const;
 
 export const EventEnvelopeSchema = z.object({
   source: z.string().min(1),
@@ -54,6 +57,33 @@ export const PlaidSnapshotReadyDetailSchema = z.object({
 });
 
 export type PlaidSnapshotReadyDetail = z.infer<typeof PlaidSnapshotReadyDetailSchema>;
+
+export const HouseholdInterpretRequestedDetailSchema = z.object({
+  schema_version: z.literal(1),
+  event_id: z.string().uuid(),
+  correlation_id: z.string().uuid().optional(),
+  person_id: z.string().uuid(),
+  household_id: z.string().uuid(),
+  trigger: z.enum(["ledger_ingest", "correction", "manual"]),
+  sync_attempt_id: z.string().uuid().nullable().optional(),
+});
+
+export type HouseholdInterpretRequestedDetail = z.infer<
+  typeof HouseholdInterpretRequestedDetailSchema
+>;
+
+export const HouseholdInterpretCompletedDetailSchema = z.object({
+  schema_version: z.literal(1),
+  event_id: z.string().uuid(),
+  correlation_id: z.string().uuid().optional(),
+  household_id: z.string().uuid(),
+  situation_version: z.number().int().positive(),
+  computed_at: z.string(),
+});
+
+export type HouseholdInterpretCompletedDetail = z.infer<
+  typeof HouseholdInterpretCompletedDetailSchema
+>;
 
 /**
  * Parse an SQS body that wraps an EventBridge event (or a bare Penny envelope for tests).

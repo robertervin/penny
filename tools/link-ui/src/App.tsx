@@ -102,7 +102,27 @@ type Status = {
     transactions: number;
     latestBalanceAt: string | null;
   };
+  situation: {
+    version: number;
+    computedAt: string;
+    runwayMonths: number | null;
+    liquidCents: number | null;
+    monthlyOutflowCents: number | null;
+    monthlyInflowCents: number | null;
+    debtPosture: {
+      revolvingBalanceCents?: number;
+    };
+  } | null;
 };
+
+function formatUsd(cents: number | null): string {
+  if (cents === null) return "—";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(cents / 100);
+}
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -171,34 +191,75 @@ export default function App() {
           </section>
 
           {status ? (
-            <section className="card">
-              <h2>Ledger status</h2>
-              <ul className="stats">
-                <li>
-                  <strong>{status.ledger.accounts}</strong> accounts
-                </li>
-                <li>
-                  <strong>{status.ledger.transactions}</strong> transactions
-                </li>
-              </ul>
-              {status.items.length > 0 ? (
-                <ul className="items">
-                  {status.items.map((item) => (
-                    <li key={item.id}>
-                      {item.institution_name ?? "Institution"} · {item.status}
-                      {item.last_synced_at
-                        ? ` · synced ${new Date(item.last_synced_at).toLocaleString()}`
-                        : " · sync pending"}
-                    </li>
-                  ))}
+            <>
+              <section className="card">
+                <h2>Ledger status</h2>
+                <ul className="stats">
+                  <li>
+                    <strong>{status.ledger.accounts}</strong> accounts
+                  </li>
+                  <li>
+                    <strong>{status.ledger.transactions}</strong> transactions
+                  </li>
                 </ul>
+                {status.items.length > 0 ? (
+                  <ul className="items">
+                    {status.items.map((item) => (
+                      <li key={item.id}>
+                        {item.institution_name ?? "Institution"} · {item.status}
+                        {item.last_synced_at
+                          ? ` · synced ${new Date(item.last_synced_at).toLocaleString()}`
+                          : " · sync pending"}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="muted">No linked items yet.</p>
+                )}
+              </section>
+
+              {status.situation ? (
+                <section className="card">
+                  <h2>Situation</h2>
+                  <p className="lede">
+                    Interpreted from your ledger — runway, liquidity, and debt posture.
+                  </p>
+                  <ul className="stats">
+                    <li>
+                      <strong>
+                        {status.situation.runwayMonths !== null
+                          ? `${status.situation.runwayMonths} mo`
+                          : "—"}
+                      </strong>{" "}
+                      runway
+                    </li>
+                    <li>
+                      <strong>{formatUsd(status.situation.liquidCents)}</strong> liquid
+                    </li>
+                    <li>
+                      <strong>{formatUsd(status.situation.monthlyOutflowCents)}</strong>/mo out
+                    </li>
+                  </ul>
+                  {status.situation.debtPosture.revolvingBalanceCents ? (
+                    <p className="muted">
+                      Revolving balance:{" "}
+                      {formatUsd(status.situation.debtPosture.revolvingBalanceCents ?? null)}
+                    </p>
+                  ) : null}
+                  <p className="hint">
+                    Computed {new Date(status.situation.computedAt).toLocaleString()} · v
+                    {status.situation.version}
+                  </p>
+                </section>
               ) : (
-                <p className="muted">No linked items yet.</p>
+                <section className="card">
+                  <h2>Situation</h2>
+                  <p className="muted">
+                    Not computed yet — runs automatically after ledger ingest.
+                  </p>
+                </section>
               )}
-              <p className="hint">
-                After linking, ensure the workflow processor is running to ingest sync events.
-              </p>
-            </section>
+            </>
           ) : null}
         </>
       ) : (

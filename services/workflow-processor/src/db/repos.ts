@@ -418,3 +418,162 @@ export async function countLedgerForHousehold(pool: Db, householdId: string) {
     latestBalanceAt: rows[0]?.latest_balance ?? null,
   };
 }
+
+export type SituationRow = {
+  household_id: string;
+  version: number;
+  computed_at: Date;
+  trigger_event_id: string | null;
+  sync_attempt_id: string | null;
+  liquid_cents: string | null;
+  monthly_outflow_cents: string | null;
+  monthly_inflow_cents: string | null;
+  runway_months: string | null;
+  debt_posture: Record<string, unknown>;
+  income_shape: Record<string, unknown>;
+  liquidity_map: Record<string, unknown>;
+  recurring_commitments: Record<string, unknown>;
+  duplicate_candidates: unknown[];
+  meta: Record<string, unknown>;
+};
+
+export async function getLedgerForInterpret(
+  pool: Db,
+  householdId: string,
+  windowDays: number,
+) {
+  const { rows: accountRows } = await pool.query<{
+    account_id: string;
+    name: string;
+    type: string;
+    subtype: string | null;
+    mask: string | null;
+    include_in_runway: boolean;
+    current_cents: string | null;
+    available_cents: string | null;
+  }>(
+    `SELECT DISTINCT ON (a.id)
+       a.id AS account_id,
+       a.name,
+       a.type,
+       a.subtype,
+       a.mask,
+       a.include_in_runway,
+       bs.current_cents,
+       bs.available_cents
+     FROM accounts a
+     LEFT JOIN balance_snapshots bs ON bs.account_id = a.id
+     WHERE a.household_id = $1
+     ORDER BY a.id, bs.as_of DESC NULLS LAST`,
+    [householdId],
+  );
+
+  const { rows: txnRows } = await pool.query<{
+    account_id: string;
+    account_type: string;
+    amount_cents: string;
+    pending: boolean;
+    payment_channel: string | null;
+    raw_name: string | null;
+  }>(
+    `SELECT t.account_id, a.type AS account_type, t.amount_cents, t.pending, t.payment_channel, t.raw_name
+     FROM transactions t
+     JOIN accounts a ON a.id = t.account_id
+     WHERE a.household_id = $1
+       AND t.removed_at IS NULL
+       AND t.posted_date >= CURRENT_DATE - ($2::int * INTERVAL '1 day')`,
+    [householdId, windowDays],
+  );
+
+  return {
+    accounts: accountRows.map((r) => ({
+      accountId: r.account_id,
+      name: r.name,
+      type: r.type,
+      subtype: r.subtype,
+      mask: r.mask,
+      includeInRunway: r.include_in_runway,
+      currentCents: r.current_cents !== null ? Number(r.current_cents) : null,
+      availableCents: r.available_cents !== null ? Number(r.available_cents) : null,
+    })),
+    transactions: txnRows.map((r) => ({
+      accountId: r.account_id,
+      accountType: r.account_type,
+      amountCents: Number(r.amount_cents),
+      pending: r.pending,
+      paymentChannel: r.payment_channel,
+      rawName: r.raw_name,
+    })),
+  };
+}
+
+export async function upsertSituation(
+  pool: Db,
+  row: {
+    householdId: string;
+    version: number;
+    computedAt: string;
+    triggerEventId: string;
+    syncAttemptId: string | null;
+    liquidCents: number;
+    monthlyOutflowCents: number;
+    monthlyInflowCents: number;
+    runwayMonths: number | null;
+    debtPosture: Record<string, unknown>;
+    incomeShape: Record<string, unknown>;
+    liquidityMap: Record<string, unknown>;
+    recurringCommitments: Record<string, unknown>;
+    duplicateCandidates: unknown[];
+    meta: Record<string, unknown>;
+  },
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO situations (
+       household_id, version, computed_at, trigger_event_id, sync_attempt_id,
+       liquid_cents, monthly_outflow_cents, monthly_inflow_cents, runway_months,
+       debt_posture, income_shape, liquidity_map, recurring_commitments,
+       duplicate_candidates, meta
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+     ON CONFLICT (household_id) DO UPDATE SET
+       version = EXCLUDED.version,
+       computed_at = EXCLUDED.computed_at,
+       trigger_event_id = EXCLUDED.trigger_event_id,
+       sync_attempt_id = EXCLUDED.sync_attempt_id,
+       liquid_cents = EXCLUDED.liquid_cents,
+       monthly_outflow_cents = EXCLUDED.monthly_outflow_cents,
+       monthly_inflow_cents = EXCLUDED.monthly_inflow_cents,
+       runway_months = EXCLUDED.runway_months,
+       debt_posture = EXCLUDED.debt_posture,
+       income_shape = EXCLUDED.income_shape,
+       liquidity_map = EXCLUDED.liquidity_map,
+       recurring_commitments = EXCLUDED.recurring_commitments,
+       duplicate_candidates = EXCLUDED.duplicate_candidates,
+       meta = EXCLUDED.meta,
+       updated_at = now()`,
+    [
+      row.householdId,
+      row.version,
+      row.computedAt,
+      row.triggerEventId,
+      row.syncAttemptId,
+      row.liquidCents,
+      row.monthlyOutflowCents,
+      row.monthlyInflowCents,
+      row.runwayMonths,
+      JSON.stringify(row.debtPosture),
+      JSON.stringify(row.incomeShape),
+      JSON.stringify(row.liquidityMap),
+      JSON.stringify(row.recurringCommitments),
+      JSON.stringify(row.duplicateCandidates),
+      JSON.stringify(row.meta),
+    ],
+  );
+}
+
+export async function getSituation(pool: Db, householdId: string): Promise<SituationRow | null> {
+  const { rows } = await pool.query<SituationRow>(
+    `SELECT * FROM situations WHERE household_id = $1`,
+    [householdId],
+  );
+  return rows[0] ?? null;
+}

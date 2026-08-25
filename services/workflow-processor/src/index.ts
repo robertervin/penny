@@ -6,6 +6,7 @@ import { createLogger } from "./logger.js";
 import { createPlaidGateway } from "./plaid/gateway.js";
 import { WorkflowProcessor } from "./processor/processor.js";
 import { createLedgerIngestWorkflow } from "./workflows/ledgerIngest.js";
+import { createInterpretWorkflow } from "./workflows/interpret.js";
 import { createPlaidSyncWorkflow } from "./workflows/plaidSync.js";
 import { WorkflowRouter } from "./workflows/router.js";
 
@@ -24,6 +25,7 @@ async function main() {
     [
       createPlaidSyncWorkflow({ config, pool, clients, plaid, tokens, log }),
       createLedgerIngestWorkflow({ config, pool, clients, log }),
+      createInterpretWorkflow({ config, pool, clients, log }),
     ],
     log,
   );

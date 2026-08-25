@@ -18,6 +18,7 @@ import {
   SOURCE_PLAID,
   type EventEnvelope,
 } from "../events/envelope.js";
+import { publishHouseholdInterpretRequested } from "../events/publishInterpret.js";
 import type { Logger } from "../logger.js";
 import { dollarsToCents, plaidAmountToCents, type PlaidSyncSnapshot } from "./snapshot.js";
 import type { Workflow, WorkflowContext } from "./types.js";
@@ -133,6 +134,16 @@ export function createLedgerIngestWorkflow(deps: {
           },
           "ledger ingest committed",
         );
+
+        await publishHouseholdInterpretRequested({
+          config: deps.config,
+          clients: deps.clients,
+          personId: snapshot.person_id,
+          householdId: snapshot.household_id,
+          trigger: "ledger_ingest",
+          syncAttemptId: snapshot.sync_attempt_id,
+          correlationId: ctx.correlationId ?? envelope.correlationId ?? detail.correlation_id,
+        });
       } catch (err) {
         try {
           await client.query("ROLLBACK");

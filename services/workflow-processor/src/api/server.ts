@@ -11,9 +11,11 @@ import { createPool, runMigrations } from "../db/pool.js";
 import {
   countLedgerForHousehold,
   getOrCreateLocalHousehold,
+  getSituation,
   insertPlaidItem,
   listPlaidItemsForHousehold,
 } from "../db/repos.js";
+import { publishHouseholdInterpretRequested } from "../events/publishInterpret.js";
 import { publishPlaidSyncRequested } from "../events/publishSync.js";
 import { createLogger } from "../logger.js";
 import { createPlaidApi } from "../plaid/client.js";
@@ -137,8 +139,73 @@ export function createApp(deps: {
     const householdId = c.req.param("householdId");
     const items = await listPlaidItemsForHousehold(deps.pool, householdId);
     const ledger = await countLedgerForHousehold(deps.pool, householdId);
-    return c.json({ items, ledger });
+    const situation = await getSituation(deps.pool, householdId);
+    return c.json({
+      items,
+      ledger,
+      situation: situation
+        ? {
+            version: situation.version,
+            computedAt: situation.computed_at,
+            runwayMonths: situation.runway_months !== null ? Number(situation.runway_months) : null,
+            liquidCents: situation.liquid_cents !== null ? Number(situation.liquid_cents) : null,
+            monthlyOutflowCents:
+              situation.monthly_outflow_cents !== null
+                ? Number(situation.monthly_outflow_cents)
+                : null,
+            monthlyInflowCents:
+              situation.monthly_inflow_cents !== null ? Number(situation.monthly_inflow_cents) : null,
+            debtPosture: situation.debt_posture,
+            liquidityMap: situation.liquidity_map,
+          }
+        : null,
+    });
   });
+
+  app.get("/api/household/:householdId/situation", async (c) => {
+    const householdId = c.req.param("householdId");
+    const situation = await getSituation(deps.pool, householdId);
+    if (!situation) {
+      return c.json({ error: "Situation not computed yet" }, 404);
+    }
+    return c.json({
+      householdId: situation.household_id,
+      version: situation.version,
+      computedAt: situation.computed_at,
+      runwayMonths: situation.runway_months !== null ? Number(situation.runway_months) : null,
+      liquidCents: situation.liquid_cents !== null ? Number(situation.liquid_cents) : null,
+      monthlyOutflowCents:
+        situation.monthly_outflow_cents !== null ? Number(situation.monthly_outflow_cents) : null,
+      monthlyInflowCents:
+        situation.monthly_inflow_cents !== null ? Number(situation.monthly_inflow_cents) : null,
+      debtPosture: situation.debt_posture,
+      incomeShape: situation.income_shape,
+      liquidityMap: situation.liquidity_map,
+      meta: situation.meta,
+    });
+  });
+
+  app.post(
+    "/api/household/:householdId/interpret",
+    zValidator(
+      "json",
+      z.object({
+        person_id: z.string().uuid(),
+      }),
+    ),
+    async (c) => {
+      const householdId = c.req.param("householdId");
+      const body = c.req.valid("json");
+      const { eventId } = await publishHouseholdInterpretRequested({
+        config: deps.config,
+        clients: aws,
+        personId: body.person_id,
+        householdId,
+        trigger: "manual",
+      });
+      return c.json({ event_id: eventId });
+    },
+  );
 
   return app;
 }
