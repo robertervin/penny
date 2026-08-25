@@ -1,0 +1,26 @@
+{
+  "name": "Penny · Plaid Link",
+  "install": "./scripts/dev/install-prereqs.sh && cd services/workflow-processor && npm ci && cd ../../tools/link-ui && npm ci",
+  "start": "./scripts/dev/link-stack-start.sh",
+  "terminals": [
+    {
+      "name": "plaid-api",
+      "command": "cd services/workflow-processor && npm run api:dev",
+      "description": "Plaid Link HTTP API on port 3001"
+    },
+    {
+      "name": "workflow-processor",
+      "command": "cd services/workflow-processor && npm run dev",
+      "description": "SQS workflow processor (Plaid sync + ledger ingest)"
+    },
+    {
+      "name": "link-ui",
+      "command": "cd tools/link-ui && npm run dev -- --host 0.0.0.0 --port 5174",
+      "description": "Plaid Link UI on port 5174 — open in Cursor preview"
+    }
+  ],
+  "ports": [
+    { "name": "link-ui", "port": 5174 },
+    { "name": "plaid-api", "port": 3001 }
+  ]
+}

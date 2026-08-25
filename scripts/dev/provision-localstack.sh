@@ -60,7 +60,8 @@ aws_ls sqs set-queue-attributes --queue-url "${WORK_URL}" --attributes "${REDRIV
 aws_ls s3api create-bucket --bucket "${BUCKET}" >/dev/null 2>&1 || true
 aws_ls events create-event-bus --name "${BUS_NAME}" >/dev/null 2>&1 || true
 
-POLICY="$(cat <<EOF
+POLICY_FILE="$(mktemp)"
+cat > "${POLICY_FILE}" <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -74,8 +75,10 @@ POLICY="$(cat <<EOF
   ]
 }
 EOF
-)"
-aws_ls sqs set-queue-attributes --queue-url "${WORK_URL}" --attributes "Policy=${POLICY}" >/dev/null
+ATTR_FILE="$(mktemp)"
+python3 -c "import json; print(json.dumps({'Policy': open('${POLICY_FILE}').read()}))" > "${ATTR_FILE}"
+aws_ls sqs set-queue-attributes --queue-url "${WORK_URL}" --attributes file://"${ATTR_FILE}" >/dev/null
+rm -f "${POLICY_FILE}" "${ATTR_FILE}"
 
 # All Penny background events share one queue; the processor routes by type.
 aws_ls events put-rule \
