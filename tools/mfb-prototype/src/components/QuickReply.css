@@ -1,0 +1,23 @@
+.qr-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem 0.85rem;
+  justify-content: flex-start;
+}
+.qr-chip {
+  border: 1.5px solid #0b84fe;
+  background: #fff;
+  color: #0b84fe;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.qr-chip:hover {
+  background: #eef6ff;
+}
+.qr-chip:active {
+  transform: scale(0.98);
+}

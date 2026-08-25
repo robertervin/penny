@@ -14,5 +14,6 @@ Background work is one Kubernetes Deployment (`penny-workflow-processor`) that r
 ```
 
 Processor service: [services/workflow-processor/README.md](services/workflow-processor/README.md)  
+Messages for Business local prototype: [tools/mfb-prototype/README.md](tools/mfb-prototype/README.md)  
 Architecture: [docs/architecture/plaid-sync-local-aws.md](docs/architecture/plaid-sync-local-aws.md)  
 Scripts: [scripts/dev/README.md](scripts/dev/README.md)
