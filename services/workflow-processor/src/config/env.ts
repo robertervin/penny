@@ -22,6 +22,8 @@ const ConfigSchema = z.object({
   workerConcurrency: z.coerce.number().int().positive().default(4),
   workflowTimeoutMs: z.coerce.number().int().positive().default(270_000),
   logLevel: z.string().default("info"),
+  apiPort: z.coerce.number().int().positive().default(3001),
+  corsOrigins: z.string().default("http://localhost:5174,http://127.0.0.1:5174"),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -42,6 +44,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     workerConcurrency: env.WORKER_CONCURRENCY ?? "4",
     workflowTimeoutMs: env.WORKFLOW_TIMEOUT_MS ?? "270000",
     logLevel: env.LOG_LEVEL ?? "info",
+    apiPort: env.API_PORT ?? "3001",
+    corsOrigins: env.CORS_ORIGINS ?? "http://localhost:5174,http://127.0.0.1:5174",
   });
 
   if (!parsed.success) {

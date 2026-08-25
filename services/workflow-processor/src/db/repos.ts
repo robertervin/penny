@@ -312,3 +312,109 @@ export async function seedPlaidConnection(
 
   return { personId, householdId, itemId };
 }
+
+const LOCAL_DEV_REF = "local-dev";
+
+/** Single-user local bootstrap (Link UI). */
+export async function getOrCreateLocalHousehold(
+  pool: Db,
+  externalRef = LOCAL_DEV_REF,
+): Promise<{ personId: string; householdId: string }> {
+  const existing = await pool.query<{ person_id: string; household_id: string }>(
+    `SELECT hm.person_id, hm.household_id
+     FROM people p
+     JOIN household_members hm ON hm.person_id = p.id
+     WHERE p.external_ref = $1
+     LIMIT 1`,
+    [externalRef],
+  );
+  if (existing.rows[0]) {
+    return {
+      personId: existing.rows[0].person_id,
+      householdId: existing.rows[0].household_id,
+    };
+  }
+
+  const personId = crypto.randomUUID();
+  const householdId = crypto.randomUUID();
+  await pool.query(`INSERT INTO people (id, external_ref) VALUES ($1, $2)`, [
+    personId,
+    externalRef,
+  ]);
+  await pool.query(`INSERT INTO households (id) VALUES ($1)`, [householdId]);
+  await pool.query(
+    `INSERT INTO household_members (household_id, person_id) VALUES ($1, $2)`,
+    [householdId, personId],
+  );
+  return { personId, householdId };
+}
+
+export async function insertPlaidItem(
+  pool: Db,
+  row: {
+    householdId: string;
+    personId: string;
+    plaidItemExternalId: string;
+    accessTokenEncrypted: string;
+    institutionId?: string | null;
+    institutionName?: string | null;
+  },
+): Promise<{ itemId: string }> {
+  const { rows } = await pool.query<{ id: string }>(
+    `INSERT INTO plaid_items (
+       id, household_id, person_id, plaid_item_id, institution_id, institution_name,
+       access_token_encrypted, status
+     ) VALUES (gen_random_uuid(),$1,$2,$3,$4,$5,$6,'active')
+     ON CONFLICT (plaid_item_id) DO UPDATE SET
+       access_token_encrypted = EXCLUDED.access_token_encrypted,
+       institution_id = EXCLUDED.institution_id,
+       institution_name = EXCLUDED.institution_name,
+       status = 'active',
+       updated_at = now()
+     RETURNING id`,
+    [
+      row.householdId,
+      row.personId,
+      row.plaidItemExternalId,
+      row.institutionId ?? null,
+      row.institutionName ?? null,
+      row.accessTokenEncrypted,
+    ],
+  );
+  return { itemId: rows[0]!.id };
+}
+
+export async function listPlaidItemsForHousehold(pool: Db, householdId: string) {
+  const { rows } = await pool.query(
+    `SELECT id, plaid_item_id, institution_id, institution_name, status,
+            last_synced_at, created_at
+     FROM plaid_items
+     WHERE household_id = $1
+     ORDER BY created_at DESC`,
+    [householdId],
+  );
+  return rows;
+}
+
+export async function countLedgerForHousehold(pool: Db, householdId: string) {
+  const { rows } = await pool.query<{
+    accounts: string;
+    transactions: string;
+    latest_balance: Date | null;
+  }>(
+    `SELECT
+       (SELECT COUNT(*)::text FROM accounts WHERE household_id = $1) AS accounts,
+       (SELECT COUNT(*)::text FROM transactions t
+        JOIN accounts a ON a.id = t.account_id
+        WHERE a.household_id = $1 AND t.removed_at IS NULL) AS transactions,
+       (SELECT MAX(bs.as_of) FROM balance_snapshots bs
+        JOIN accounts a ON a.id = bs.account_id
+        WHERE a.household_id = $1) AS latest_balance`,
+    [householdId],
+  );
+  return {
+    accounts: Number(rows[0]?.accounts ?? 0),
+    transactions: Number(rows[0]?.transactions ?? 0),
+    latestBalanceAt: rows[0]?.latest_balance ?? null,
+  };
+}
