@@ -252,7 +252,7 @@ SMS webhook → thread state machine → Correction API → Memory DB
                                     → SMS reply with summary
 ```
 
-### API (workflow-processor or future `penny-api`)
+### API (`src/api`)
 
 | Method | Path | Purpose |
 |---|---|---|

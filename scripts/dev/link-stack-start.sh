@@ -1,79 +1,43 @@
 #!/usr/bin/env bash
-# Bootstrap Postgres + LocalStack + migrations for Plaid Link local dev.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PENNY_BIN="${PENNY_BIN:-${HOME}/.local/bin}"
-export PATH="${PENNY_BIN}:${PATH}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
 
-log() { printf '%s\n' "$*"; }
-
-ensure_docker() {
-  if ! command -v docker >/dev/null; then
-    log "Docker not installed; skipping LocalStack container"
-    return 1
-  fi
-  if ! docker info >/dev/null 2>&1; then
-    sudo service docker start 2>/dev/null || true
-    sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
-  fi
-  docker info >/dev/null 2>&1
-}
-
-ensure_postgres() {
-  if command -v pg_isready >/dev/null && pg_isready -h localhost -U penny -d penny >/dev/null 2>&1; then
-    return 0
-  fi
-  if command -v docker >/dev/null && docker info >/dev/null 2>&1; then
-    docker compose -f "${ROOT}/docker-compose.yml" up -d postgres
-    for _ in $(seq 1 30); do
-      pg_isready -h localhost -U penny -d penny >/dev/null 2>&1 && return 0
-      sleep 1
-    done
-  fi
-  if command -v pg_isready >/dev/null; then
-    sudo service postgresql start 2>/dev/null || true
-    sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='penny'" | grep -q 1 \
-      || sudo -u postgres psql -c "CREATE USER penny WITH PASSWORD 'penny' CREATEDB;"
-    sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='penny'" | grep -q 1 \
-      || sudo -u postgres psql -c "CREATE DATABASE penny OWNER penny;"
-    pg_isready -h localhost -U penny -d penny >/dev/null 2>&1
-  else
-    log "Postgres not available"
-    return 1
-  fi
-}
-
-ensure_localstack() {
-  ensure_docker || return 1
-  if ! curl -fsS http://localhost:4566/_localstack/health >/dev/null 2>&1; then
-    docker rm -f penny-localstack >/dev/null 2>&1 || true
-    docker run -d --name penny-localstack \
-      -p 4566:4566 \
-      -e SERVICES=sqs,s3,events,iam \
-      localstack/localstack:3.8 >/dev/null
-    for _ in $(seq 1 60); do
-      curl -fsS http://localhost:4566/_localstack/health >/dev/null 2>&1 && break
-      sleep 2
-    done
-  fi
-  curl -fsS http://localhost:4566/_localstack/health >/dev/null
-  AWS_REGION="${AWS_REGION:-us-east-2}" "${ROOT}/scripts/dev/provision-localstack.sh"
-}
-
-log "Starting Penny Link stack infrastructure…"
-ensure_postgres
-ensure_localstack || log "warn: LocalStack unavailable — sync after link will not work"
-
-cd "${ROOT}/services/workflow-processor"
-if [[ -f .env ]]; then
-  npx tsx --env-file=.env src/db/migrate.ts
-else
-  DATABASE_URL="${DATABASE_URL:-postgres://penny:penny@localhost:5432/penny}" npm run migrate
+if [[ ! -f src/.env ]]; then
+  echo "Missing src/.env. Copy src/.env.example and fill in Plaid credentials."
+  exit 1
 fi
 
-log "Infrastructure ready."
-log "  Link UI:            http://localhost:5174"
-log "  Plaid API:          http://localhost:3001"
-log "  Postgres:           postgres://penny:penny@localhost:5432/penny"
-log "  LocalStack:         http://localhost:4566"
+./scripts/dev/postgres-up.sh
+./scripts/dev/localstack-up.sh
+
+npm install
+
+npm run migrate
+
+SESSION_API="penny-api"
+SESSION_PROCESSOR="penny-workflow-processor"
+SESSION_LINK_UI="penny-link-ui"
+
+start_tmux_session() {
+  local session_name="$1"
+  local command="$2"
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    echo "Session $session_name already running"
+    return
+  fi
+  tmux new-session -d -s "$session_name" -c "$ROOT_DIR" -- bash -lc "$command"
+}
+
+start_tmux_session "$SESSION_API" "npm run api:dev"
+start_tmux_session "$SESSION_PROCESSOR" "npm run processor:dev"
+start_tmux_session "$SESSION_LINK_UI" "cd tools/link-ui && npm install && npm run dev -- --host 0.0.0.0 --port 5174"
+
+echo ""
+echo "Penny link stack started:"
+echo "  API:                 http://localhost:3001"
+echo "  Link UI:             http://localhost:5174"
+echo "  tmux sessions:       $SESSION_API, $SESSION_PROCESSOR, $SESSION_LINK_UI"
+echo ""
+echo "Stop with: tmux kill-session -t $SESSION_API; tmux kill-session -t $SESSION_PROCESSOR; tmux kill-session -t $SESSION_LINK_UI"

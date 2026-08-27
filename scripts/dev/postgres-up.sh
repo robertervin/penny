@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
-# Local Postgres for Plaid Link + workflow processor (no kind required).
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-command -v docker >/dev/null || { echo "Docker required" >&2; exit 1; }
-docker compose -f "${ROOT}/docker-compose.yml" up -d postgres
-echo "Postgres: postgres://penny:penny@localhost:5432/penny"
-echo "Run migrations: cd services/workflow-processor && npm run migrate"
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
+
+if [[ ! -f src/.env ]]; then
+  echo "Missing src/.env. Copy src/.env.example and fill in DATABASE_URL."
+  exit 1
+fi
+
+set -a
+source src/.env
+set +a
+
+docker compose -f deploy/local/postgres.yaml up -d
+
+npm install
+npm run migrate
