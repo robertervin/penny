@@ -1,24 +1,41 @@
 # Messages for Business local prototype
 
-Minimal stand-in for Apple Messages for Business interactive UI so we can prototype Penny’s audit without an MSP.
+MfB-shaped UI for chatting with Penny. **Live mode** routes messages through the SMS gateway to your real household data.
 
-## What it simulates
+## Prerequisites
 
-| MfB feature | In this tool |
-|---|---|
-| Quick Reply | Chip buttons under the thread |
-| List Picker | Bottom sheet with sections / checkmarks |
-| Form | Bottom sheet with input pages |
-| `interactiveData` JSON | Shown in the left debug panel |
+1. Postgres + Penny API running (`npm run api:dev`, `npm run processor:dev`)
+2. SMS gateway (`npm run sms:dev` on port 3002)
+3. `src/.env` with `PENNY_DEV_HOUSEHOLD_ID` and `PENNY_DEV_PERSON_ID` (from Link UI bootstrap)
+4. Optional: `OPENAI_API_KEY` for natural-language explore (keywords work without it)
 
-Payload field names intentionally track Apple’s interactive dictionaries so an MSP swap is mostly transport.
+Or use the all-in-one stack from repo root:
+
+```bash
+./scripts/dev/link-stack-start.sh
+```
 
 ## Run
 
 ```bash
 cd tools/mfb-prototype
 npm install
-npm run dev -- --host 0.0.0.0 --port 5173
+npm run dev
 ```
 
-Open http://localhost:5173 — walk the scripted audit (runway → debt list picker → goals → plan).
+Open **http://localhost:5173** — default mode is **Live finances**.
+
+Vite proxies `/sms` → `http://localhost:3002/dev/sms`.
+
+## Modes
+
+| Mode | Description |
+|---|---|
+| **Live finances** | Free-text + shortcuts → SMS gateway → Penny API |
+| **Scripted audit** | Original offline audit walkthrough |
+
+## Try it
+
+- `WHY income` — breakdown fast-path
+- `What is my operating runway?` — explore (needs OpenAI)
+- `RULES`, `UNDO`, `HELP` — memory commands

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
 import { createLogger, createPool, runMigrations } from "@penny/core";
 import { loadConfig } from "./config/env.js";
@@ -6,6 +7,21 @@ import { MessageRouter } from "./router/MessageRouter.js";
 
 export function createSmsApp(router: MessageRouter, devMode: boolean) {
   const app = new Hono();
+
+  if (devMode) {
+    app.use(
+      "*",
+      cors({
+        origin: [
+          "http://localhost:5173",
+          "http://127.0.0.1:5173",
+          "http://localhost:5174",
+          "http://127.0.0.1:5174",
+        ],
+        credentials: true,
+      }),
+    );
+  }
 
   app.get("/health", (c) => c.json({ ok: true }));
 
