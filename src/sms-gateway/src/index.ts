@@ -59,7 +59,7 @@ async function main() {
   const router = new MessageRouter(pool, config);
   const app = createSmsApp(router, config.devMode);
 
-  serve({ fetch: app.fetch, port: config.smsPort }, () => {
+  serve({ fetch: app.fetch, port: config.smsPort, hostname: "0.0.0.0" }, () => {
     log.info(
       {
         port: config.smsPort,

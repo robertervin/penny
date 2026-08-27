@@ -12,7 +12,7 @@ export async function startApiServer(config: Config) {
   const app = createApp({ config, pool, log });
   const port = config.apiPort;
 
-  serve({ fetch: app.fetch, port }, () => {
+  serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
     log.info({ port, cors: config.corsOrigins }, "penny plaid api listening");
   });
 }
