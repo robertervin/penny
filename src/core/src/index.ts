@@ -26,6 +26,10 @@ export * from "./interpret/classifyTransaction.js";
 export * from "./interpret/computeSituation.js";
 export * from "./interpret/breakdown.js";
 export { computeSituationForHousehold, INTERPRET_WINDOW_DAYS } from "./interpret/computeForHousehold.js";
+export {
+  getSituationBreakdownForHousehold,
+  VALID_BREAKDOWN_BUCKETS,
+} from "./interpret/situationQuery.js";
 
 // Logger
 export { createLogger, type Logger } from "./logger.js";

@@ -4,6 +4,20 @@ HTTP API for Plaid Link, household status, Situation, and Memory rules.
 
 Shared database models and business logic live in [`@penny/core`](../core).
 
+## Layout
+
+```
+src/
+  app.ts                 # Hono app factory, mounts route modules
+  server.ts              # bootstrap (migrations, listen)
+  composition/           # dependency wiring
+  routes/                # thin HTTP adapters
+  schemas/               # request validation (Zod)
+  mappers/               # core/DB types → API DTOs
+  services/              # application/use-case layer
+  middleware/            # error → HTTP mapping
+```
+
 ## Develop
 
 From repo root:
@@ -11,6 +25,7 @@ From repo root:
 ```bash
 npm install
 npm run typecheck -w @penny/api
+npm run test -w @penny/api
 ```
 
 ## Run locally

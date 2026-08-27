@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "npm run build -w @penny/core && npm run build -w @penny/api && npm run build -w @penny/workflow-processor",
-    "test": "npm run test -w @penny/core && npm run test -w @penny/workflow-processor",
+    "test": "npm run test -w @penny/core && npm run test -w @penny/api && npm run test -w @penny/workflow-processor",
     "typecheck": "npm run build -w @penny/core && npm run typecheck -w @penny/core && npm run typecheck -w @penny/api && npm run typecheck -w @penny/workflow-processor",
     "migrate": "npm run migrate -w @penny/core",
     "api:dev": "npm run dev -w @penny/api",
