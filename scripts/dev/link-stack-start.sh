@@ -9,11 +9,14 @@ if [[ ! -f src/.env ]]; then
   exit 1
 fi
 
-./scripts/dev/postgres-up.sh
-./scripts/dev/localstack-up.sh
+echo "Starting Penny local stack (Mac / laptop — not Cloud Agent VM)."
+echo "Requires Docker Desktop and kind. See docs/local-development.md"
+echo ""
+
+./scripts/dev/kind-up.sh
+./scripts/dev/provision-localstack.sh
 
 npm install
-
 npm run migrate
 
 SESSION_API="penny-api"
@@ -35,15 +38,15 @@ start_tmux_session() {
 start_tmux_session "$SESSION_API" "npm run api:dev"
 start_tmux_session "$SESSION_PROCESSOR" "npm run processor:dev"
 start_tmux_session "$SESSION_SMS" "npm run sms:dev"
-start_tmux_session "$SESSION_LINK_UI" "cd tools/link-ui && npm install && npm run dev -- --host 0.0.0.0 --port 5174"
-start_tmux_session "$SESSION_MFB" "cd tools/mfb-prototype && npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+start_tmux_session "$SESSION_LINK_UI" "cd tools/link-ui && npm install && npm run dev -- --host 127.0.0.1 --port 5174"
+start_tmux_session "$SESSION_MFB" "cd tools/mfb-prototype && npm install && npm run dev -- --host 127.0.0.1 --port 5173"
 
 echo ""
-echo "Penny link stack started:"
+echo "Penny link stack started on this machine:"
 echo "  API:                 http://localhost:3001"
 echo "  SMS gateway:         http://localhost:3002"
 echo "  Link UI:             http://localhost:5174"
 echo "  MfB prototype:       http://localhost:5173"
 echo "  tmux sessions:       $SESSION_API, $SESSION_PROCESSOR, $SESSION_SMS, $SESSION_LINK_UI, $SESSION_MFB"
 echo ""
-echo "Set PENNY_DEV_HOUSEHOLD_ID + PENNY_DEV_PERSON_ID in src/.env for live MfB chat."
+echo "Set PENNY_DEV_HOUSEHOLD_ID + PENNY_DEV_PERSON_ID in src/.env after Link UI bootstrap."

@@ -1,12 +1,18 @@
 # Local development toolchain
 
-Run from the repo root.
+Run from the repo root **on your Mac** (not Cursor Cloud Agents — see [docs/local-development.md](../../docs/local-development.md)).
 
 ```bash
 ./scripts/dev/install-prereqs.sh
 ./scripts/dev/verify-prereqs.sh
 ./scripts/dev/kind-up.sh
 ./scripts/dev/provision-localstack.sh
+```
+
+Or one command for the full app stack:
+
+```bash
+./scripts/dev/link-stack-start.sh
 ```
 
 `install-prereqs.sh` installs **kubectl**, **kind**, **Helm**, and **AWS CLI v2** into `~/.local/bin` (override with `PENNY_BIN`). It does **not** install Docker — install Docker Desktop (macOS) or Docker Engine (Linux) first and ensure `docker info` works.

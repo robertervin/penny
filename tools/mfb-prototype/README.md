@@ -1,6 +1,8 @@
 # Messages for Business local prototype
 
-MfB-shaped UI for chatting with Penny. **Live mode** routes messages through the SMS gateway to your real household data.
+MfB-shaped UI for chatting with Penny. **Run on your Mac** with the local stack — not in Cursor Cloud Agents (see [docs/local-development.md](../../docs/local-development.md)).
+
+**Live mode** routes messages through the SMS gateway to your real household data.
 
 ## Prerequisites
 

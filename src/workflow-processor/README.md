@@ -17,11 +17,11 @@ npm run typecheck -w @penny/workflow-processor
 
 ## Run locally
 
-Copy `src/.env.example` to `src/.env`, then from repo root:
+Copy `src/.env.example` to `src/.env` on your Mac, then from repo root:
 
 ```bash
-./scripts/dev/postgres-up.sh
-./scripts/dev/localstack-up.sh   # or kind + provision-localstack.sh
+./scripts/dev/kind-up.sh
+./scripts/dev/provision-localstack.sh
 npm run migrate
 npm run processor:dev
 ```
