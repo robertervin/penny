@@ -32,18 +32,23 @@ export function formatBreakdownSummary(
   },
   bucket: string,
 ): string {
+  const txns = breakdown.transactions ?? [];
+  if (txns.length === 0) {
+    return truncateSms(
+      `No ${bucket} transactions in the last 90 days.\n\nConnect accounts at Link UI (port 5174), wait for sync + interpret, then try again.`,
+    );
+  }
+
   const monthly = breakdown.monthlyEstimateCents
     ? `$${(breakdown.monthlyEstimateCents / 100).toLocaleString("en-US", { maximumFractionDigits: 0 })}/mo`
     : "n/a";
 
-  const lines = (breakdown.transactions ?? [])
-    .slice(0, 5)
-    .map((t, i) => {
-      const amt = t.amountCents
-        ? `$${(Math.abs(t.amountCents) / 100).toLocaleString("en-US", { maximumFractionDigits: 0 })}`
-        : "?";
-      return `${i + 1}. ${t.label ?? "Unknown"} — ${amt}`;
-    });
+  const lines = txns.slice(0, 5).map((t, i) => {
+    const amt = t.amountCents
+      ? `$${(Math.abs(t.amountCents) / 100).toLocaleString("en-US", { maximumFractionDigits: 0 })}`
+      : "?";
+    return `${i + 1}. ${t.label ?? "Unknown"} — ${amt}`;
+  });
 
   return truncateSms(
     [`${bucket} ~${monthly} (90d avg). Top lines:`, ...lines, "", 'Reply naturally to fix, or "IGNORE those".'].join(

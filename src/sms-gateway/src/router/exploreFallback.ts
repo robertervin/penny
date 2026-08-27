@@ -42,17 +42,26 @@ export async function tryExploreWithoutLlm(
             ? `Total inflow: ${formatCents(total)}`
             : null,
           "",
-          "Reply WHY income for line items, or connect accounts in Link UI if empty.",
+          "Reply WHY income for line items.",
         ]
           .filter(Boolean)
           .join("\n"),
       );
     } catch {
-      const breakdown = (await client.getSituationBreakdown(householdId, {
-        bucket: "income",
-        limit: 5,
-      })) as Parameters<typeof formatBreakdownSummary>[0];
-      return formatBreakdownSummary(breakdown, "income");
+      try {
+        const breakdown = (await client.getSituationBreakdown(householdId, {
+          bucket: "income",
+          limit: 5,
+        })) as Parameters<typeof formatBreakdownSummary>[0];
+        if ((breakdown.transactions?.length ?? 0) > 0) {
+          return formatBreakdownSummary(breakdown, "income");
+        }
+      } catch {
+        // fall through
+      }
+      return truncateSms(
+        "No income data yet. Connect accounts at Link UI (port 5174), wait for sync, then try WHY income.",
+      );
     }
   }
 
