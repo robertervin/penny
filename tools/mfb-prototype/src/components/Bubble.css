@@ -1,0 +1,42 @@
+.row {
+  display: flex;
+  margin: 0.35rem 0;
+}
+.row.mine {
+  justify-content: flex-end;
+}
+.row.theirs {
+  justify-content: flex-start;
+}
+.bubble {
+  max-width: 78%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 1.1rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+.bubble-theirs {
+  background: #e9e9eb;
+  color: #111;
+  border-bottom-left-radius: 0.25rem;
+}
+.bubble-mine {
+  background: #0b84fe;
+  color: #fff;
+  border-bottom-right-radius: 0.25rem;
+}
+.bubble-sub {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+.bubble-cta {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0b84fe;
+}
+.bubble-mine .bubble-cta {
+  color: #d6ebff;
+}

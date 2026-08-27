@@ -1,0 +1,23 @@
+{
+  "name": "penny",
+  "private": true,
+  "workspaces": [
+    "src/core",
+    "src/api-client",
+    "src/agent",
+    "src/api",
+    "src/workflow-processor",
+    "src/sms-gateway",
+    "tools/penny-mcp"
+  ],
+  "scripts": {
+    "build": "npm run build -w @penny/core && npm run build -w @penny/api-client && npm run build -w @penny/agent && npm run build -w @penny/api && npm run build -w @penny/workflow-processor && npm run build -w @penny/sms-gateway && npm run build -w penny-mcp",
+    "test": "npm run test -w @penny/core && npm run test -w @penny/api && npm run test -w @penny/agent && npm run test -w @penny/workflow-processor && npm run test -w @penny/sms-gateway",
+    "typecheck": "npm run build -w @penny/core && npm run build -w @penny/api-client && npm run typecheck -w @penny/core && npm run typecheck -w @penny/api-client && npm run typecheck -w @penny/agent && npm run typecheck -w @penny/api && npm run typecheck -w @penny/workflow-processor && npm run typecheck -w @penny/sms-gateway && npm run typecheck -w penny-mcp",
+    "migrate": "npm run migrate -w @penny/core",
+    "api:dev": "npm run dev -w @penny/api",
+    "processor:dev": "npm run dev -w @penny/workflow-processor",
+    "sms:dev": "npm run dev -w @penny/sms-gateway",
+    "mcp:dev": "npm run dev -w penny-mcp"
+  }
+}

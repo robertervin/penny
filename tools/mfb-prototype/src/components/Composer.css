@@ -1,0 +1,115 @@
+.composer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem 0.85rem;
+  border-top: 1px solid #e5e5ea;
+  background: rgba(249, 249, 249, 0.95);
+}
+
+.composer-input {
+  flex: 1;
+  border: 1px solid #d1d1d6;
+  border-radius: 1.25rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+}
+
+.composer-input:focus {
+  outline: none;
+  border-color: #007aff;
+}
+
+.composer-send {
+  border: none;
+  background: #007aff;
+  color: #fff;
+  border-radius: 1.25rem;
+  padding: 0.55rem 0.95rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.composer-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem 0;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+
+.shortcut {
+  border: 1px solid #d1d1d6;
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: #007aff;
+}
+
+.shortcut:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  margin-top: 0.5rem;
+}
+
+.status-pill.ok {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pill.err {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-pill.wait {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.mode-toggle button {
+  flex: 1;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 0.45rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.mode-toggle button.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.typing {
+  font-size: 0.8rem;
+  color: #8e8e93;
+  padding: 0 0.75rem 0.35rem;
+  font-style: italic;
+}
