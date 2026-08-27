@@ -13,6 +13,8 @@ Or one command for the full app stack:
 
 ```bash
 ./scripts/dev/link-stack-start.sh
+./scripts/dev/link-stack-restart.sh   # stop + start
+./scripts/dev/link-stack-stop.sh      # stop only
 ```
 
 `install-prereqs.sh` installs **kubectl**, **kind**, **Helm**, and **AWS CLI v2** into `~/.local/bin` (override with `PENNY_BIN`). It does **not** install Docker — install Docker Desktop (macOS) or Docker Engine (Linux) first and ensure `docker info` works.

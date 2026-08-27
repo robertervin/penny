@@ -29,6 +29,7 @@ From repo root, with `src/.env` filled in (copy from `src/.env.example`):
 ```bash
 cp src/.env.example src/.env   # if needed — edit Plaid keys + household IDs
 ./scripts/dev/link-stack-start.sh
+./scripts/dev/link-stack-restart.sh   # stop all services, then start fresh
 ```
 
 This starts:
