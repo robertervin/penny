@@ -17,6 +17,7 @@ import {
 import type { Config } from "../config/env.js";
 import { formatBreakdownSummary, formatHelp, formatProposal, truncateSms } from "../format/sms.js";
 import { parseKeywordMessage } from "../parse/keywords.js";
+import { formatLlmError, tryExploreWithoutLlm } from "./exploreFallback.js";
 
 export type InboundMessage = {
   from: string;
@@ -117,6 +118,15 @@ export class MessageRouter {
       return { to: phone, body: formatBreakdownSummary(breakdown, keyword.bucket) };
     }
 
+    const exploreReply = await tryExploreWithoutLlm(
+      this.client,
+      identity.householdId,
+      msg.body,
+    );
+    if (exploreReply) {
+      return { to: phone, body: exploreReply };
+    }
+
     if (!this.llm) {
       return {
         to: phone,
@@ -125,44 +135,52 @@ export class MessageRouter {
     }
 
     const history = (thread.messages as AgentMessage[]).slice(-12);
-    const turn = await runAgentTurn({
-      llm: this.llm,
-      model: this.config.openAiModel,
-      tools: this.tools.definitions,
-      context: {
+    try {
+      const turn = await runAgentTurn({
+        llm: this.llm,
+        model: this.config.openAiModel,
+        tools: this.tools.definitions,
+        context: {
+          householdId: identity.householdId,
+          personId: identity.personId,
+          channel: "sms",
+        },
+        messages: history,
+        userMessage: msg.body,
+        interceptWrites: true,
+        maxToolRounds: 3,
+      });
+
+      const newState: ThreadState = { ...state };
+      let reply = turn.reply;
+
+      if (turn.pendingProposal?.length) {
+        newState.awaiting = "confirm";
+        newState.pendingProposal = turn.pendingProposal;
+        reply = formatProposal(turn.pendingProposal);
+      } else {
+        delete newState.awaiting;
+        delete newState.pendingProposal;
+      }
+
+      await upsertThreadSession(this.pool, {
+        channel: CHANNEL,
+        externalThreadId: phone,
         householdId: identity.householdId,
         personId: identity.personId,
-        channel: "sms",
-      },
-      messages: history,
-      userMessage: msg.body,
-      interceptWrites: true,
-      maxToolRounds: 3,
-    });
+        mode: "explore",
+        state: newState,
+        messages: turn.messages.slice(-20),
+      });
 
-    const newState: ThreadState = { ...state };
-    let reply = turn.reply;
-
-    if (turn.pendingProposal?.length) {
-      newState.awaiting = "confirm";
-      newState.pendingProposal = turn.pendingProposal;
-      reply = formatProposal(turn.pendingProposal);
-    } else {
-      delete newState.awaiting;
-      delete newState.pendingProposal;
+      return { to: phone, body: truncateSms(reply) };
+    } catch (err) {
+      const fallback = await tryExploreWithoutLlm(this.client, identity.householdId, msg.body);
+      if (fallback) {
+        return { to: phone, body: fallback };
+      }
+      return { to: phone, body: formatLlmError(err) };
     }
-
-    await upsertThreadSession(this.pool, {
-      channel: CHANNEL,
-      externalThreadId: phone,
-      householdId: identity.householdId,
-      personId: identity.personId,
-      mode: "explore",
-      state: newState,
-      messages: turn.messages.slice(-20),
-    });
-
-    return { to: phone, body: truncateSms(reply) };
   }
 
   private async handleConfirm(

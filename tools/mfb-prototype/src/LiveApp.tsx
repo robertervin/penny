@@ -75,7 +75,9 @@ export function LiveApp() {
       setMessages((prev) => [
         ...prev,
         pennyText(
-          "I couldn't reach the Penny backend. Make sure API + SMS gateway are running (npm run api:dev, npm run sms:dev).",
+          message.includes("500") || message.includes("502") || message.includes("503")
+            ? "I couldn't reach the Penny backend. Make sure API + SMS gateway are running (npm run api:dev, npm run sms:dev)."
+            : `Error: ${message}`,
         ),
       ]);
     } finally {
