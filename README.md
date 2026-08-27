@@ -32,7 +32,7 @@ npm run sms:dev          # SMS gateway port 3002
 Explore via MCP: see [tools/penny-mcp/README.md](tools/penny-mcp/README.md).  
 SMS gateway: [src/sms-gateway/README.md](src/sms-gateway/README.md).
 
-Or use `./scripts/dev/link-stack-start.sh` for API + processor + Link UI.
+Or use `./scripts/dev/link-stack-start.sh` for API + processor + SMS gateway + Link UI + MfB prototype.
 
 ## Local infrastructure (Kubernetes + EventBridge/SQS)
 
@@ -48,7 +48,7 @@ Background work is one Kubernetes Deployment (`penny-workflow-processor`) that r
 
 API: [src/api/README.md](src/api/README.md)  
 Workflow processor: [src/workflow-processor/README.md](src/workflow-processor/README.md)  
-Messages for Business local prototype: [tools/mfb-prototype/README.md](tools/mfb-prototype/README.md)  
+Messages for Business local prototype: [tools/mfb-prototype/README.md](tools/mfb-prototype/README.md) (live chat via SMS gateway)  
 Plaid Link (connect your accounts locally): [tools/link-ui/README.md](tools/link-ui/README.md)  
 Architecture: [docs/architecture/plaid-sync-local-aws.md](docs/architecture/plaid-sync-local-aws.md)  
 Scripts: [scripts/dev/README.md](scripts/dev/README.md)
