@@ -5,6 +5,7 @@ export { loadConfig, type Config } from "./config/env.js";
 export { createPool, runMigrations, type Db } from "./db/pool.js";
 export * from "./db/repos.js";
 export * from "./db/memoryRepos.js";
+export * from "./db/channelRepos.js";
 
 // Events
 export * from "./events/envelope.js";

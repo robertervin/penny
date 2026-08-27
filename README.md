@@ -12,8 +12,12 @@ All deployables live under `src/`:
 | Package | Path | Description |
 |---|---|---|
 | `@penny/core` | [src/core](src/core) | Shared DB models, events, interpret, Plaid, AWS |
+| `@penny/api-client` | [src/api-client](src/api-client) | Typed HTTP client for Penny API |
+| `@penny/agent` | [src/agent](src/agent) | Shared agent tools, prompts, LLM runtime |
 | `@penny/api` | [src/api](src/api) | HTTP API (Plaid Link, Situation, Memory) |
 | `@penny/workflow-processor` | [src/workflow-processor](src/workflow-processor) | SQS consumer + workflow router |
+| `@penny/sms-gateway` | [src/sms-gateway](src/sms-gateway) | SMS explore + execute |
+| `penny-mcp` | [tools/penny-mcp](tools/penny-mcp) | MCP server for Cursor/ChatGPT Explore |
 
 Copy `src/.env.example` to `src/.env` before running services locally.
 
@@ -22,7 +26,11 @@ npm install
 npm run migrate
 npm run api:dev          # port 3001
 npm run processor:dev    # SQS worker
+npm run sms:dev          # SMS gateway port 3002
 ```
+
+Explore via MCP: see [tools/penny-mcp/README.md](tools/penny-mcp/README.md).  
+SMS gateway: [src/sms-gateway/README.md](src/sms-gateway/README.md).
 
 Or use `./scripts/dev/link-stack-start.sh` for API + processor + Link UI.
 

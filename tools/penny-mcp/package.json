@@ -1,0 +1,30 @@
+{
+  "name": "penny-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Penny MCP server — Explore tools over the Penny API",
+  "type": "module",
+  "bin": {
+    "penny-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "pretypecheck": "npm run build -w @penny/agent && npm run build -w @penny/api-client",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@penny/agent": "*",
+    "@penny/api-client": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
