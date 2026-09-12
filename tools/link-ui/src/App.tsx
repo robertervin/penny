@@ -144,21 +144,24 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const stored = localStorage.getItem("penny.session");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Session;
-        setSession(parsed);
-        void refreshStatus(parsed.householdId);
-        return;
-      } catch {
-        localStorage.removeItem("penny.session");
-      }
-    }
     api<{ personId: string; householdId: string }>("/api/session/bootstrap", {
       method: "POST",
     })
       .then((s) => {
+        const stored = localStorage.getItem("penny.session");
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored) as Session;
+            if (
+              parsed.householdId !== s.householdId ||
+              parsed.personId !== s.personId
+            ) {
+              console.warn("Replacing stale Link UI session with bootstrap IDs");
+            }
+          } catch {
+            localStorage.removeItem("penny.session");
+          }
+        }
         setSession(s);
         localStorage.setItem("penny.session", JSON.stringify(s));
         return refreshStatus(s.householdId);

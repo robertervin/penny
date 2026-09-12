@@ -7,6 +7,7 @@ import type {
   ToolDefinition,
 } from "./types.js";
 import { baseSystemPrompt } from "./prompts/system.js";
+import { compactAgentHistory, sanitizeAgentMessagesForLlm } from "./history.js";
 import { toolByName } from "./tools/pennyTools.js";
 
 export type RunAgentTurnOpts = {
@@ -40,18 +41,19 @@ function extractProposal(toolName: string, args: Record<string, unknown>): Propo
 
 export async function runAgentTurn(opts: RunAgentTurnOpts): Promise<AgentTurnResult> {
   const maxRounds = opts.maxToolRounds ?? 3;
-  const messages: AgentMessage[] = [
+  const history = compactAgentHistory(opts.messages);
+  const messages: AgentMessage[] = sanitizeAgentMessagesForLlm([
     { role: "system", content: baseSystemPrompt(opts.context.channel) },
-    ...opts.messages,
+    ...history,
     { role: "user", content: opts.userMessage },
-  ];
+  ]);
 
   let pendingProposal: ProposedMemoryRule[] | undefined;
   let reply = "";
 
   for (let round = 0; round < maxRounds; round++) {
     const completion = await opts.llm.complete({
-      messages,
+      messages: sanitizeAgentMessagesForLlm(messages),
       tools: opts.tools,
       model: opts.model,
     });
@@ -111,13 +113,17 @@ export async function runAgentTurn(opts: RunAgentTurnOpts): Promise<AgentTurnRes
     }
 
     if (round === maxRounds - 1) {
-      const final = await opts.llm.complete({ messages, tools: [], model: opts.model });
+      const final = await opts.llm.complete({
+        messages: sanitizeAgentMessagesForLlm(messages),
+        tools: [],
+        model: opts.model,
+      });
       reply = final.content ?? "Done.";
       messages.push({ role: "assistant", content: reply });
     }
   }
 
-  return { reply, messages, pendingProposal };
+  return { reply, messages: compactAgentHistory(messages), pendingProposal };
 }
 
 function formatProposalReply(rules: ProposedMemoryRule[]): string {

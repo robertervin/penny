@@ -32,5 +32,14 @@ export {
   VALID_BREAKDOWN_BUCKETS,
 } from "./interpret/situationQuery.js";
 
+// Explore
+export { exploreQuerySchema, exploreMetricSchema, type ExploreQuery, type ExploreMetric } from "./explore/querySchema.js";
+export {
+  executeExploreQuery,
+  runExploreQueryOnLedger,
+  type ExploreQueryResult,
+  type ExploreLine,
+} from "./explore/queryExecutor.js";
+
 // Logger
 export { createLogger, type Logger } from "./logger.js";

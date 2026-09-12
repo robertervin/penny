@@ -1,4 +1,5 @@
 import type { AgentMessage, LlmClient, LlmToolCall } from "../types.js";
+import { sanitizeAgentMessagesForLlm } from "../history.js";
 
 type OpenAiMessage =
   | { role: "system" | "user" | "assistant"; content: string }
@@ -76,7 +77,7 @@ export function createOpenAiLlm(config: OpenAiLlmConfig): LlmClient {
 }
 
 function toOpenAiMessages(messages: AgentMessage[]): OpenAiMessage[] {
-  return messages.map((m) => {
+  return sanitizeAgentMessagesForLlm(messages).map((m) => {
     if (m.role === "tool") {
       return { role: "tool", tool_call_id: m.toolCallId, content: m.content };
     }

@@ -11,6 +11,7 @@ import {
   PlaidLinkService,
   SessionService,
   SituationQueryService,
+  ExploreQueryService,
   type ApiServices,
 } from "../services/index.js";
 
@@ -29,5 +30,6 @@ export function createApiServices(deps: {
     situation: new SituationQueryService(deps.pool),
     memory: new MemoryCommandService(deps.pool, interpret),
     interpret,
+    explore: new ExploreQueryService(deps.pool),
   };
 }

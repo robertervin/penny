@@ -104,4 +104,11 @@ export class PennyApiClient {
       body: JSON.stringify(input),
     });
   }
+
+  runExploreQuery(householdId: string, query: Record<string, unknown>) {
+    return this.request<unknown>(`/api/household/${householdId}/explore/query`, {
+      method: "POST",
+      body: JSON.stringify(query),
+    });
+  }
 }

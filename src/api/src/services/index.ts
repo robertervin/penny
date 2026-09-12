@@ -4,6 +4,7 @@ export { PlaidLinkService } from "./PlaidLinkService.js";
 export { HouseholdStatusService } from "./HouseholdStatusService.js";
 export { SituationQueryService } from "./SituationQueryService.js";
 export { MemoryCommandService } from "./MemoryCommandService.js";
+export { ExploreQueryService } from "./ExploreQueryService.js";
 
 import type { InterpretTriggerService } from "./InterpretTriggerService.js";
 import type { SessionService } from "./SessionService.js";
@@ -11,6 +12,7 @@ import type { PlaidLinkService } from "./PlaidLinkService.js";
 import type { HouseholdStatusService } from "./HouseholdStatusService.js";
 import type { SituationQueryService } from "./SituationQueryService.js";
 import type { MemoryCommandService } from "./MemoryCommandService.js";
+import type { ExploreQueryService } from "./ExploreQueryService.js";
 
 export type ApiServices = {
   session: SessionService;
@@ -19,4 +21,5 @@ export type ApiServices = {
   situation: SituationQueryService;
   memory: MemoryCommandService;
   interpret: InterpretTriggerService;
+  explore: ExploreQueryService;
 };

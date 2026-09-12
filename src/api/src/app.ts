@@ -9,6 +9,7 @@ import { createHouseholdRoutes } from "./routes/household.js";
 import { createSituationRoutes } from "./routes/situation.js";
 import { createMemoryRoutes } from "./routes/memory.js";
 import { createInterpretRoutes } from "./routes/interpret.js";
+import { createExploreRoutes } from "./routes/explore.js";
 
 export function createApp(deps: { config: Config; pool: Db; log: Logger }) {
   const app = new Hono();
@@ -25,6 +26,7 @@ export function createApp(deps: { config: Config; pool: Db; log: Logger }) {
     createSituationRoutes(services),
     createMemoryRoutes(services),
     createInterpretRoutes(services),
+    createExploreRoutes(services),
   ]) {
     app.route("/", mount);
   }

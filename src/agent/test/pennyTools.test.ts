@@ -9,6 +9,7 @@ describe("createPennyTools", () => {
     });
     expect(definitions.some((d) => d.name === "create_memory_rule")).toBe(false);
     expect(definitions.some((d) => d.name === "propose_memory_rules")).toBe(true);
+    expect(definitions.some((d) => d.name === "run_explore_query")).toBe(true);
   });
 
   it("excludes propose_memory_rules on MCP channel", () => {

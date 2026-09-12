@@ -27,6 +27,37 @@ export function createPennyTools(
       execute: async (_args, ctx) => JSON.stringify(await client.getSituation(ctx.householdId)),
     },
     {
+      name: "run_explore_query",
+      description:
+        "Run a structured explore query over classified ledger data. Use for ad-hoc questions with filters, time windows, or merchant exclusions. Params: metric (income|payroll|outflow|operating_outflow|debt_service|transactions), window_days (1-365), exclude_label_patterns, include_label_patterns, account_types, group_by (merchant|day|account), limit.",
+      parameters: {
+        type: "object",
+        properties: {
+          metric: {
+            type: "string",
+            enum: ["income", "payroll", "outflow", "operating_outflow", "debt_service", "transactions"],
+          },
+          window_days: { type: "number" },
+          account_types: {
+            type: "array",
+            items: { type: "string", enum: ["depository", "credit", "other"] },
+          },
+          include_buckets: { type: "array", items: { type: "string" } },
+          exclude_buckets: { type: "array", items: { type: "string" } },
+          include_label_patterns: { type: "array", items: { type: "string" } },
+          exclude_label_patterns: { type: "array", items: { type: "string" } },
+          group_by: { type: "string", enum: ["merchant", "day", "account"] },
+          limit: { type: "number" },
+        },
+        required: ["metric"],
+        additionalProperties: false,
+      },
+      execute: async (args, ctx) =>
+        JSON.stringify(
+          await client.runExploreQuery(ctx.householdId, args as Record<string, unknown>),
+        ),
+    },
+    {
       name: "get_situation_breakdown",
       description:
         "Get line-item breakdown for a bucket: income, payroll, outflow, operating_outflow, debt_service, ignored, transfer.",

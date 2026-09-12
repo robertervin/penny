@@ -3,6 +3,7 @@ import {
   createOpenAiLlm,
   createPennyTools,
   runAgentTurn,
+  compactAgentHistory,
   type AgentMessage,
   type LlmClient,
 } from "@penny/agent";
@@ -17,7 +18,7 @@ import {
 import type { Config } from "../config/env.js";
 import { formatBreakdownSummary, formatHelp, formatProposal, truncateSms } from "../format/sms.js";
 import { parseKeywordMessage } from "../parse/keywords.js";
-import { formatLlmError, tryExploreWithoutLlm } from "./exploreFallback.js";
+import { formatLlmError } from "./exploreFallback.js";
 
 export type InboundMessage = {
   from: string;
@@ -118,15 +119,6 @@ export class MessageRouter {
       return { to: phone, body: formatBreakdownSummary(breakdown, keyword.bucket) };
     }
 
-    const exploreReply = await tryExploreWithoutLlm(
-      this.client,
-      identity.householdId,
-      msg.body,
-    );
-    if (exploreReply) {
-      return { to: phone, body: exploreReply };
-    }
-
     if (!this.llm) {
       return {
         to: phone,
@@ -134,7 +126,7 @@ export class MessageRouter {
       };
     }
 
-    const history = (thread.messages as AgentMessage[]).slice(-12);
+    const history = compactAgentHistory((thread.messages as AgentMessage[]).slice(-12));
     try {
       const turn = await runAgentTurn({
         llm: this.llm,
@@ -148,7 +140,7 @@ export class MessageRouter {
         messages: history,
         userMessage: msg.body,
         interceptWrites: true,
-        maxToolRounds: 3,
+        maxToolRounds: 4,
       });
 
       const newState: ThreadState = { ...state };
@@ -170,15 +162,12 @@ export class MessageRouter {
         personId: identity.personId,
         mode: "explore",
         state: newState,
-        messages: turn.messages.slice(-20),
+        messages: turn.messages,
       });
 
       return { to: phone, body: truncateSms(reply) };
     } catch (err) {
-      const fallback = await tryExploreWithoutLlm(this.client, identity.householdId, msg.body);
-      if (fallback) {
-        return { to: phone, body: fallback };
-      }
+      await clearThreadState(this.pool, CHANNEL, phone);
       return { to: phone, body: formatLlmError(err) };
     }
   }
