@@ -21,40 +21,12 @@ export type PendingRuleProposal = {
   }>;
 };
 
-export async function findPersonByPhone(pool: Db, phoneE164: string) {
-  const { rows } = await pool.query<{ id: string }>(
-    `SELECT id FROM people WHERE phone_e164 = $1 LIMIT 1`,
-    [phoneE164],
-  );
-  return rows[0]?.id ?? null;
-}
-
-export async function bindPhoneToPerson(
-  pool: Db,
-  personId: string,
-  phoneE164: string,
-): Promise<void> {
-  await pool.query(`UPDATE people SET phone_e164 = $2 WHERE id = $1`, [personId, phoneE164]);
-}
-
 export async function getHouseholdForPerson(pool: Db, personId: string) {
   const { rows } = await pool.query<{ household_id: string }>(
     `SELECT household_id FROM household_members WHERE person_id = $1 LIMIT 1`,
     [personId],
   );
   return rows[0]?.household_id ?? null;
-}
-
-export async function resolveHouseholdByPhone(pool: Db, phoneE164: string) {
-  const { rows } = await pool.query<{ person_id: string; household_id: string }>(
-    `SELECT p.id AS person_id, hm.household_id
-     FROM people p
-     JOIN household_members hm ON hm.person_id = p.id
-     WHERE p.phone_e164 = $1
-     LIMIT 1`,
-    [phoneE164],
-  );
-  return rows[0] ?? null;
 }
 
 export async function getThreadSession(

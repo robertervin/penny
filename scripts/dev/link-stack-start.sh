@@ -21,9 +21,7 @@ npm run migrate
 
 SESSION_API="penny-api"
 SESSION_PROCESSOR="penny-workflow-processor"
-SESSION_SMS="penny-sms-gateway"
 SESSION_LINK_UI="penny-link-ui"
-SESSION_MFB="penny-mfb"
 
 start_tmux_session() {
   local session_name="$1"
@@ -37,16 +35,12 @@ start_tmux_session() {
 
 start_tmux_session "$SESSION_API" "npm run api:dev"
 start_tmux_session "$SESSION_PROCESSOR" "npm run processor:dev"
-start_tmux_session "$SESSION_SMS" "npm run sms:dev"
 start_tmux_session "$SESSION_LINK_UI" "cd tools/link-ui && npm install && npm run dev -- --host 127.0.0.1 --port 5174"
-start_tmux_session "$SESSION_MFB" "cd tools/mfb-prototype && npm install && npm run dev -- --host 127.0.0.1 --port 5173"
 
 echo ""
 echo "Penny link stack started on this machine:"
 echo "  API:                 http://localhost:3001"
-echo "  SMS gateway:         http://localhost:3002"
 echo "  Link UI:             http://localhost:5174"
-echo "  MfB prototype:       http://localhost:5173"
-echo "  tmux sessions:       $SESSION_API, $SESSION_PROCESSOR, $SESSION_SMS, $SESSION_LINK_UI, $SESSION_MFB"
+echo "  tmux sessions:       $SESSION_API, $SESSION_PROCESSOR, $SESSION_LINK_UI"
 echo ""
-echo "Set PENNY_DEV_HOUSEHOLD_ID + PENNY_DEV_PERSON_ID in src/.env after Link UI bootstrap."
+echo "Set PENNY_HOUSEHOLD_ID + PENNY_PERSON_ID in src/.env after Link UI bootstrap (used by penny-mcp)."

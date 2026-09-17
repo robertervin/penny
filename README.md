@@ -49,6 +49,12 @@ The long-term vision is for Penny to become the financial decision layer that co
 > **Plaid and finance data run on your Mac only** — not in Cursor Cloud Agents.  
 > See [docs/local-development.md](docs/local-development.md) for the full local stack.
 
+## Vision and plan
+
+Product vision and V1 scope: [docs/penny-v1-implementation-context.md](docs/penny-v1-implementation-context.md), [docs/penny-mvp-features.md](docs/penny-mvp-features.md).  
+Deterministic routing engine spec: [docs/allocation-engine.md](docs/allocation-engine.md).  
+What to build next: [docs/v0-implementation-plan.md](docs/v0-implementation-plan.md).
+
 ## Terminology
 
 Product and architecture vocabulary (client file, Situation, Audit vs Interpret, Guidance, etc.): [docs/terminology.md](docs/terminology.md).
@@ -62,10 +68,12 @@ All deployables live under `src/`:
 | `@penny/core` | [src/core](src/core) | Shared DB models, events, interpret, Plaid, AWS |
 | `@penny/api-client` | [src/api-client](src/api-client) | Typed HTTP client for Penny API |
 | `@penny/agent` | [src/agent](src/agent) | Shared agent tools, prompts, LLM runtime |
-| `@penny/api` | [src/api](src/api) | HTTP API (Plaid Link, Situation, Memory) |
+| `@penny/api` | [src/api](src/api) | HTTP API (Plaid Link, Situation, Memory, Explore) |
 | `@penny/workflow-processor` | [src/workflow-processor](src/workflow-processor) | SQS consumer + workflow router |
-| `@penny/sms-gateway` | [src/sms-gateway](src/sms-gateway) | SMS explore + execute |
-| `penny-mcp` | [tools/penny-mcp](tools/penny-mcp) | MCP server for Cursor/ChatGPT Explore |
+| `penny-mcp` | [tools/penny-mcp](tools/penny-mcp) | MCP server for Cursor/ChatGPT |
+
+The user-facing surface will be a **desktop app**, built after V0 data work lands. There is no
+shipping UI today beyond the Plaid Link harness in [tools/link-ui](tools/link-ui).
 
 Copy `src/.env.example` to `src/.env` on your **Mac** (never commit it; never paste Plaid keys into Cloud Agents).
 
@@ -75,7 +83,7 @@ Copy `src/.env.example` to `src/.env` on your **Mac** (never commit it; never pa
 ./scripts/dev/link-stack-start.sh
 ```
 
-Then open http://localhost:5173 (MfB) and http://localhost:5174 (Link UI).
+Then open http://localhost:5174 (Link UI).
 
 **Manual services:**
 
@@ -84,11 +92,9 @@ npm install
 npm run migrate
 npm run api:dev          # port 3001
 npm run processor:dev    # SQS worker
-npm run sms:dev          # SMS gateway port 3002
 ```
 
 Explore via MCP: see [tools/penny-mcp/README.md](tools/penny-mcp/README.md).  
-SMS gateway: [src/sms-gateway/README.md](src/sms-gateway/README.md).  
 Local dev guide: [docs/local-development.md](docs/local-development.md).
 
 ## Local infrastructure (Kubernetes + EventBridge/SQS)
@@ -105,7 +111,6 @@ Background work is one Kubernetes Deployment (`penny-workflow-processor`) that r
 
 API: [src/api/README.md](src/api/README.md)  
 Workflow processor: [src/workflow-processor/README.md](src/workflow-processor/README.md)  
-Messages for Business local prototype: [tools/mfb-prototype/README.md](tools/mfb-prototype/README.md) (live chat via SMS gateway)  
 Plaid Link (connect your accounts locally): [tools/link-ui/README.md](tools/link-ui/README.md)  
-Architecture: [docs/architecture/plaid-sync-local-aws.md](docs/architecture/plaid-sync-local-aws.md)  
+Architecture: [docs/architecture/plaid-sync-local-aws.md](docs/architecture/plaid-sync-local-aws.md), [docs/architecture/transaction-memory.md](docs/architecture/transaction-memory.md)  
 Scripts: [scripts/dev/README.md](scripts/dev/README.md)

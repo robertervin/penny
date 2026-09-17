@@ -18,7 +18,7 @@ export type RunAgentTurnOpts = {
   messages: AgentMessage[];
   userMessage: string;
   maxToolRounds?: number;
-  /** SMS: intercept write tools and return proposal instead of executing */
+  /** Return a proposal for confirm-gated write tools instead of executing them. */
   interceptWrites?: boolean;
 };
 
@@ -83,7 +83,7 @@ export async function runAgentTurn(opts: RunAgentTurnOpts): Promise<AgentTurnRes
 
       const args = JSON.parse(call.arguments || "{}") as Record<string, unknown>;
 
-      if (opts.interceptWrites && tool.requiresConfirmOnSms) {
+      if (opts.interceptWrites && tool.requiresConfirmation) {
         pendingProposal = extractProposal(call.name, args);
         messages.push({
           role: "tool",

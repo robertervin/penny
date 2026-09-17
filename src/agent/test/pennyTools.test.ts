@@ -3,9 +3,9 @@ import { PennyApiClient } from "@penny/api-client";
 import { createPennyTools } from "../src/tools/pennyTools.js";
 
 describe("createPennyTools", () => {
-  it("excludes create_memory_rule on SMS channel", () => {
+  it("excludes create_memory_rule on the app channel", () => {
     const { definitions } = createPennyTools(new PennyApiClient("http://localhost:3001"), {
-      channel: "sms",
+      channel: "app",
     });
     expect(definitions.some((d) => d.name === "create_memory_rule")).toBe(false);
     expect(definitions.some((d) => d.name === "propose_memory_rules")).toBe(true);

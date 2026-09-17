@@ -5,12 +5,12 @@ set -euo pipefail
 SESSIONS=(
   penny-api
   penny-workflow-processor
-  penny-sms-gateway
   penny-link-ui
-  penny-mfb
   # legacy session names from older runs
   penny-processor
+  penny-sms-gateway
   penny-sms
+  penny-mfb
 )
 
 stopped=0

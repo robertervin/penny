@@ -1,6 +1,6 @@
 import type { AgentMessage } from "./types.js";
 
-/** Keep user turns and final assistant replies only — safe for cross-turn SMS context. */
+/** Keep user turns and final assistant replies only — safe for cross-turn context. */
 export function compactAgentHistory(messages: AgentMessage[]): AgentMessage[] {
   const out: AgentMessage[] = [];
   for (const m of messages) {

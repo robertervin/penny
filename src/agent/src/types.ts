@@ -1,6 +1,6 @@
 import type { PennyApiClient, ProposedMemoryRule } from "@penny/api-client";
 
-export type AgentChannel = "sms" | "mcp" | "explore";
+export type AgentChannel = "app" | "mcp";
 
 export type AgentContext = {
   householdId: string;
@@ -18,8 +18,8 @@ export type ToolDefinition = {
   description: string;
   parameters: Record<string, unknown>;
   execute: (args: Record<string, unknown>, ctx: AgentContext) => Promise<string>;
-  /** SMS: writes require user confirmation before execute */
-  requiresConfirmOnSms?: boolean;
+  /** Writes the user must confirm before they are applied. */
+  requiresConfirmation?: boolean;
 };
 
 export type AgentTurnResult = {

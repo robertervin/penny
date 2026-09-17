@@ -93,7 +93,7 @@ export function createPennyTools(
     {
       name: "propose_memory_rules",
       description:
-        "Propose one or more memory rules (SMS: user must confirm before they are saved).",
+        "Propose one or more memory rules. The user must confirm before they are saved.",
       parameters: {
         type: "object",
         properties: {
@@ -120,12 +120,12 @@ export function createPennyTools(
         required: ["rules"],
         additionalProperties: false,
       },
-      requiresConfirmOnSms: true,
+      requiresConfirmation: true,
       execute: async (args) => JSON.stringify({ proposed: args.rules, status: "awaiting_confirmation" }),
     },
     {
       name: "create_memory_rule",
-      description: "Create a memory rule immediately (use when user has confirmed or on MCP/Explore).",
+      description: "Create a memory rule immediately (use when the user has confirmed, or on MCP).",
       parameters: {
         type: "object",
         properties: {
@@ -144,7 +144,7 @@ export function createPennyTools(
         required: ["match_pattern", "action"],
         additionalProperties: false,
       },
-      requiresConfirmOnSms: true,
+      requiresConfirmation: true,
       execute: async (args, ctx) =>
         JSON.stringify(
           await client.createMemoryRule(ctx.householdId, {
@@ -185,8 +185,9 @@ export function createPennyTools(
     },
   ];
 
+  // The app surface must propose and await confirmation; MCP is a dev tool and may write directly.
   const filtered =
-    opts.channel === "sms"
+    opts.channel === "app"
       ? definitions.filter((d) => d.name !== "create_memory_rule")
       : definitions.filter((d) => d.name !== "propose_memory_rules");
 
