@@ -102,10 +102,10 @@ data, deterministic engines, and API — driven by tests, `tools/link-ui`, and `
 The *job* keeps its existing name: `interpret` remains the workflow that rebuilds financial state,
 and `HouseholdInterpretRequested` is unchanged. Only the noun changes.
 
-`docs/terminology.md` still describes the previous model (`Audit` / `Watch` / `Advise` / `Coach`
-jobs, `Guidance` umbrella). `Audit` does not appear in the new vision and the new navigation is
-Penny / Plan / Scenarios. That doc is rewritten in Stage 0 before any new code lands, so subsequent
-work isn't named against a retired model.
+`docs/terminology.md` described the previous model (`Audit` / `Watch` / `Advise` / `Coach` jobs,
+`Guidance` umbrella) and has been deleted. `Audit` does not appear in the new vision and the new
+navigation is Penny / Plan / Scenarios. Stage 0 writes its replacement before any new code lands, so
+subsequent work isn't named against a retired model.
 
 ---
 
@@ -145,7 +145,9 @@ Code:
 No back-compat aliases — there is a single local household and one first-party frontend
 (`tools/link-ui`), updated in the same change.
 
-**0.2 Rewrite `docs/terminology.md`**
+**0.2 Write the replacement `docs/terminology.md`**
+
+The old file is deleted. The new one covers only the current model.
 
 Retire: `Audit`, `Watch`, `Coach`, `Guidance`, `Situation`.
 

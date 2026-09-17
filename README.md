@@ -57,7 +57,9 @@ What to build next: [docs/v0-implementation-plan.md](docs/v0-implementation-plan
 
 ## Terminology
 
-Product and architecture vocabulary (client file, Situation, Audit vs Interpret, Guidance, etc.): [docs/terminology.md](docs/terminology.md).
+The previous vocabulary doc described a retired model (Audit / Watch / Guidance) and has been
+removed. A replacement covering Financial State, Confidence, Cash buckets, Available to Allocate,
+Goals, Policy, and Scenarios lands in [V0 Stage 0](docs/v0-implementation-plan.md).
 
 ## Monorepo layout
 

@@ -6,7 +6,8 @@ is an overlay in **Memory**, applied at Interpret time.
 **Status:** Backend implemented. The correction *surface* is deferred to the desktop app — see
 [v0-implementation-plan.md](../v0-implementation-plan.md) Stage 8.  
 **Depends on:** Interpret v1 (`situations` table, `HouseholdInterpretRequested`)  
-**Terminology:** [docs/terminology.md](../terminology.md) — Memory, Correction, Policy
+**Terminology:** Memory, Correction, and Policy are defined in the vocabulary doc rewritten in
+[V0 Stage 0](../v0-implementation-plan.md).
 
 > **Naming:** V0 Stage 0 renames `Situation` → `FinancialState` (table `situations` →
 > `financial_states`, routes `/situation` → `/financial-state`). This doc still uses the old noun

@@ -6,7 +6,7 @@ Background work is **one Kubernetes deployment**: `penny-workflow-processor`. It
 
 Implementation lives in `src/workflow-processor` (worker) and `src/api` (HTTP). Shared models and logic are in `src/core`. This document is the contract; `scripts/dev/` bootstraps the local data plane.
 
-Product vocabulary (Situation vs Audit, jobs, Guidance): see [docs/terminology.md](../terminology.md).
+Product vocabulary is being rewritten in [V0 Stage 0](../v0-implementation-plan.md); `Situation` becomes `FinancialState` and the Audit / Guidance model is retired.
 
 ---
 
