@@ -1,0 +1,35 @@
+{
+  "name": "@penny/workflow-processor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Penny background workflow processor (SQS → EventBridge-routed workflows)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "pretypecheck": "npm run build -w @penny/core",
+    "start": "node dist/index.js",
+    "predev": "npm run build -w @penny/core",
+    "dev": "tsx --env-file=../.env src/index.ts",
+    "seed-and-sync": "tsx --env-file=../.env src/scripts/seedAndSync.ts",
+    "pretest": "npm run build -w @penny/core",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@penny/core": "*",
+    "@aws-sdk/client-eventbridge": "^3.787.0",
+    "@aws-sdk/client-sqs": "^3.787.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}

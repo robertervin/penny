@@ -1,0 +1,5 @@
+{
+  "name": "Penny — code only (run Plaid stack on your Mac)",
+  "install": "npm install",
+  "start": "echo 'Finance data stays on your Mac. Do not put Plaid keys or link accounts in Cloud Agents. See docs/local-development.md.'"
+}

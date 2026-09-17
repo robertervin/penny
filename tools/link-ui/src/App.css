@@ -1,0 +1,111 @@
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  color: #111;
+  background: #f4f6f8;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  color: #667;
+  margin: 0 0 0.35rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+.lede {
+  color: #444;
+  margin: 0 0 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.ids {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+}
+
+.ids dt {
+  color: #888;
+  margin-top: 0.35rem;
+}
+
+.ids dd {
+  margin: 0;
+  word-break: break-all;
+  font-family: ui-monospace, monospace;
+}
+
+.primary {
+  width: 100%;
+  border: none;
+  background: #111;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.items {
+  padding-left: 1.1rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+}
+
+.muted {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #b00020;
+  font-size: 0.9rem;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
