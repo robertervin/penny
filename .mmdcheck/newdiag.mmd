@@ -1,0 +1,12 @@
+flowchart LR
+    P0["Phase 0 - 4 weeks<br/>Frame the bet<br/>proposal, prototype, eval sets, legal read"]
+    P1["Phase 1 - 90 days<br/>Prove the card<br/>Save and Stabilize on today's data"]
+    P2["Phase 2 - 6 months<br/>Prove the loop<br/>Goals, enrichment, what-if chat"]
+    P3["Phase 3 - 12 months<br/>Prove the ladder<br/>Wealth bucket and Premium Plus"]
+    Gate{"Compliance answer<br/>option A, B, or C"}
+
+    P0 --> P1
+    P1 -->|"action rate and precision clear the bar"| P2
+    P2 -->|"loop and ladder show lift"| P3
+    P0 --> Gate
+    Gate -.->|"scopes what can ship"| P3

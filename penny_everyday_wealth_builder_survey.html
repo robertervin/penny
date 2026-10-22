@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Penny — Everyday Wealth Builder Survey</title>
+<style>
+  :root {
+    --bg:#f5f4ef; --card:#ffffff; --ink:#1f2421; --muted:#68706a;
+    --line:#dddeda; --accent:#2f5c49; --accent2:#e6efe9; --warn:#8a5b16;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .shell{max-width:900px;margin:0 auto;padding:28px 18px 70px}
+  .hero{background:var(--card);border:1px solid var(--line);padding:32px;border-radius:18px;margin-bottom:18px}
+  .eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(30px,5vw,48px);line-height:1.05;margin:.35rem 0 .8rem}
+  .hero p{font-size:18px;color:var(--muted);max-width:760px;margin:.4rem 0}
+  .privacy{margin-top:18px;background:var(--accent2);padding:12px 14px;border-radius:10px;font-size:14px}
+  .respondent{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+  .respondent label{font-size:13px;font-weight:700;color:var(--muted)}
+  input[type="text"]{width:100%;margin-top:5px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+  .progress-wrap{position:sticky;top:0;z-index:10;background:rgba(245,244,239,.96);backdrop-filter:blur(8px);padding:10px 0 12px;margin-bottom:6px}
+  .progress-line{height:8px;background:#e3e3df;border-radius:999px;overflow:hidden}
+  .progress-bar{height:100%;width:0;background:var(--accent);transition:width .2s}
+  .progress-text{font-size:13px;color:var(--muted);margin-top:5px;text-align:right}
+  .section{background:var(--card);border:1px solid var(--line);border-radius:18px;margin:18px 0;overflow:hidden}
+  .section-head{padding:24px 26px;border-bottom:1px solid var(--line);background:#fbfbf9}
+  .section-head h2{margin:0 0 4px;font-size:22px}
+  .section-head p{margin:0;color:var(--muted)}
+  .question{padding:24px 26px;border-bottom:1px solid var(--line)}
+  .question:last-child{border-bottom:0}
+  .qprompt{font-weight:700;font-size:17px;margin-bottom:12px}
+  .qid{display:inline-block;min-width:38px;color:var(--accent);font-size:12px;letter-spacing:.06em;vertical-align:2px}
+  .help{font-size:14px;color:var(--muted);margin:-6px 0 12px}
+  textarea{width:100%;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;min-height:92px}
+  textarea:focus,input:focus,select:focus{outline:2px solid #9ab8aa;outline-offset:1px;border-color:#9ab8aa}
+  .choices{display:grid;gap:9px}
+  .choice{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+  .choice:hover{background:#fafbf9}
+  .choice input{margin-top:4px}
+  .followup{margin-top:12px}
+  .scale-labels{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);gap:16px}
+  .scale{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin:8px 0 12px}
+  .scale-choice input{position:absolute;opacity:0;pointer-events:none}
+  .scale-choice span{display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;height:40px;cursor:pointer}
+  .scale-choice input:checked + span{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .table-wrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:650px}
+  th,td{border-bottom:1px solid var(--line);padding:10px;text-align:center}
+  th:first-child{text-align:left;min-width:180px}
+  .matrix-radio{display:flex;justify-content:center}
+  .matrix-radio input{width:18px;height:18px}
+  .rank-list{display:grid;gap:8px}
+  .rank-row{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center}
+  select{padding:9px 8px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit}
+  .rank-warning{color:var(--warn);font-size:13px;margin-top:8px}
+  .footer-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;margin-top:20px}
+  .footer-card h2{margin-top:0}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  button{border:0;border-radius:10px;padding:12px 16px;font:700 15px system-ui;cursor:pointer}
+  .primary{background:var(--accent);color:#fff}
+  .secondary{background:#ecece8;color:var(--ink)}
+  .status{margin-top:12px;font-size:14px;color:var(--muted)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media (max-width:640px){
+    .shell{padding:14px 10px 50px}
+    .hero,.section-head,.question,.footer-card{padding-left:18px;padding-right:18px}
+    .respondent{grid-template-columns:1fr}
+    .scale{grid-template-columns:repeat(5,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="hero">
+    <div class="eyebrow">Penny Research</div>
+    <h1>Penny — Everyday Wealth Builder Survey</h1>
+    <p>A founder-focused survey to identify what should be optimized, delegated, explained, and challenged in the first version of Penny.</p>
+    <div class="privacy"><strong>Privacy:</strong> Everything stays in this browser. Nothing is uploaded anywhere. Your answers are saved locally on this device as you go, and at the end you can download a JSON file to send back.</div>
+    <div class="respondent">
+      <div><label for="respondent_name">Your first name</label><input id="respondent_name" type="text" placeholder="First name"></div>
+      <div><label for="respondent_note">Optional note / identifier</label><input id="respondent_note" type="text" placeholder="e.g. Brother 1"></div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-line"><div class="progress-bar" id="progress_bar"></div></div>
+    <div class="progress-text" id="progress_text">0% complete</div>
+  </div>
+
+  
+    <section class="section">
+      <div class="section-head">
+        <h2>1. What am I actually optimizing for?</h2>
+        <p>Start with life outcomes, not optimization mechanics.</p>
+      </div>
+      
+    <div class="question" data-question="q1">
+      <label class="qprompt" for="q1"><span class="qid">Q1</span>Finish this sentence without using financial terminology: I want money to eventually give me the ability to…</label>
+      
+      <textarea id="q1" data-qid="q1" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question rank-question" data-question="q2">
+      <div class="qprompt"><span class="qid">Q2</span>Rank what matters most to you financially.</div>
+      <div class="help">Use 1 for most important and 13 for least important. Use each number once.</div>
+      <div class="rank-list">
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Ability to stop working early" aria-label="Rank for Ability to stop working early"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Ability to stop working early</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Ability to choose more meaningful/lower-paying work" aria-label="Rank for Ability to choose more meaningful/lower-paying work"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Ability to choose more meaningful/lower-paying work</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Financial security" aria-label="Rank for Financial security"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Financial security</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Building a high net worth" aria-label="Rank for Building a high net worth"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Building a high net worth</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Comfortable lifestyle" aria-label="Rank for Comfortable lifestyle"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Comfortable lifestyle</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Nice home" aria-label="Rank for Nice home"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Nice home</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Travel/experiences" aria-label="Rank for Travel/experiences"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Travel/experiences</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Providing for a family" aria-label="Rank for Providing for a family"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Providing for a family</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Ability for one spouse to stop working" aria-label="Rank for Ability for one spouse to stop working"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Ability for one spouse to stop working</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Generational wealth" aria-label="Rank for Generational wealth"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Generational wealth</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Giving/charity" aria-label="Rank for Giving/charity"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Giving/charity</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Flexibility to take career breaks" aria-label="Rank for Flexibility to take career breaks"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Flexibility to take career breaks</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q2" data-subkey="Something else" aria-label="Rank for Something else"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option></select>
+          <span>Something else</span>
+        </div></div>
+      <div class="rank-warning" id="q2_warning" role="status"></div>
+    </div>
+    <div class="question" data-question="q3">
+      <label class="qprompt" for="q3"><span class="qid">Q3</span>What does “financial independence” actually mean to you?</label>
+      
+      <textarea id="q3" data-qid="q3" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q4">
+      <label class="qprompt" for="q4"><span class="qid">Q4</span>What age would you like work to become optional?</label>
+      
+      <textarea id="q4" data-qid="q4" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q5">
+      <label class="qprompt" for="q5"><span class="qid">Q5</span>How important is maximizing wealth versus enjoying more money today? Where do you naturally fall on that spectrum?</label>
+      
+      <textarea id="q5" data-qid="q5" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>2. Where do I still experience uncertainty?</h2>
+        <p>Focus on the work, ambiguity, and cognitive load that still remains.</p>
+      </div>
+      
+    <div class="question" data-question="q6">
+      <label class="qprompt" for="q6"><span class="qid">Q6</span>Think about the last year. What are the five biggest financial decisions you&#x27;ve had to think about?</label>
+      
+      <textarea id="q6" data-qid="q6" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q7">
+      <label class="qprompt" for="q7"><span class="qid">Q7</span>Which decisions required the most research, spreadsheets, ChatGPT conversations, mental energy, or second-guessing?</label>
+      
+      <textarea id="q7" data-qid="q7" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q8">
+      <label class="qprompt" for="q8"><span class="qid">Q8</span>What financial questions do you repeatedly revisit because you&#x27;re never fully satisfied with the answer?</label>
+      
+      <textarea id="q8" data-qid="q8" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q9">
+      <label class="qprompt" for="q9"><span class="qid">Q9</span>What parts of your finances do you feel extremely confident managing yourself?</label>
+      
+      <textarea id="q9" data-qid="q9" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q10">
+      <label class="qprompt" for="q10"><span class="qid">Q10</span>What parts do you understand but frankly don&#x27;t want to spend time managing?</label>
+      
+      <textarea id="q10" data-qid="q10" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q11">
+      <label class="qprompt" for="q11"><span class="qid">Q11</span>What areas do you suspect you could be doing better in, even if nothing is obviously wrong?</label>
+      
+      <textarea id="q11" data-qid="q11" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q12">
+      <label class="qprompt" for="q12"><span class="qid">Q12</span>Have you ever thought, “I&#x27;m probably leaving money on the table somewhere”? If so, where?</label>
+      
+      <textarea id="q12" data-qid="q12" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>3. The household wealth engine</h2>
+        <p>What should Penny understand and optimize across the whole financial life?</p>
+      </div>
+      
+    <div class="question" data-question="q13">
+      <div class="qprompt"><span class="qid">Q13</span>If Penny could continuously evaluate the household, which areas should it understand?</div>
+      
+      <div class="table-wrap"><table class="matrix"><thead><tr><th></th><th>Essential</th><th>Useful</th><th>Not important</th></tr></thead><tbody><tr><th>Cash</th><td><label class="matrix-radio" for="q13_0_0">
+            <input type="radio" id="q13_0_0" name="q13_0" data-qid="q13" data-subkey="Cash" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_0_1">
+            <input type="radio" id="q13_0_1" name="q13_0" data-qid="q13" data-subkey="Cash" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_0_2">
+            <input type="radio" id="q13_0_2" name="q13_0" data-qid="q13" data-subkey="Cash" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Monthly spending</th><td><label class="matrix-radio" for="q13_1_0">
+            <input type="radio" id="q13_1_0" name="q13_1" data-qid="q13" data-subkey="Monthly spending" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_1_1">
+            <input type="radio" id="q13_1_1" name="q13_1" data-qid="q13" data-subkey="Monthly spending" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_1_2">
+            <input type="radio" id="q13_1_2" name="q13_1" data-qid="q13" data-subkey="Monthly spending" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Income</th><td><label class="matrix-radio" for="q13_2_0">
+            <input type="radio" id="q13_2_0" name="q13_2" data-qid="q13" data-subkey="Income" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_2_1">
+            <input type="radio" id="q13_2_1" name="q13_2" data-qid="q13" data-subkey="Income" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_2_2">
+            <input type="radio" id="q13_2_2" name="q13_2" data-qid="q13" data-subkey="Income" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Brokerage investments</th><td><label class="matrix-radio" for="q13_3_0">
+            <input type="radio" id="q13_3_0" name="q13_3" data-qid="q13" data-subkey="Brokerage investments" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_3_1">
+            <input type="radio" id="q13_3_1" name="q13_3" data-qid="q13" data-subkey="Brokerage investments" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_3_2">
+            <input type="radio" id="q13_3_2" name="q13_3" data-qid="q13" data-subkey="Brokerage investments" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>401(k)s</th><td><label class="matrix-radio" for="q13_4_0">
+            <input type="radio" id="q13_4_0" name="q13_4" data-qid="q13" data-subkey="401(k)s" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_4_1">
+            <input type="radio" id="q13_4_1" name="q13_4" data-qid="q13" data-subkey="401(k)s" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_4_2">
+            <input type="radio" id="q13_4_2" name="q13_4" data-qid="q13" data-subkey="401(k)s" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>IRAs/Roth IRAs</th><td><label class="matrix-radio" for="q13_5_0">
+            <input type="radio" id="q13_5_0" name="q13_5" data-qid="q13" data-subkey="IRAs/Roth IRAs" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_5_1">
+            <input type="radio" id="q13_5_1" name="q13_5" data-qid="q13" data-subkey="IRAs/Roth IRAs" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_5_2">
+            <input type="radio" id="q13_5_2" name="q13_5" data-qid="q13" data-subkey="IRAs/Roth IRAs" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>HSAs</th><td><label class="matrix-radio" for="q13_6_0">
+            <input type="radio" id="q13_6_0" name="q13_6" data-qid="q13" data-subkey="HSAs" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_6_1">
+            <input type="radio" id="q13_6_1" name="q13_6" data-qid="q13" data-subkey="HSAs" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_6_2">
+            <input type="radio" id="q13_6_2" name="q13_6" data-qid="q13" data-subkey="HSAs" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Employer benefits</th><td><label class="matrix-radio" for="q13_7_0">
+            <input type="radio" id="q13_7_0" name="q13_7" data-qid="q13" data-subkey="Employer benefits" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_7_1">
+            <input type="radio" id="q13_7_1" name="q13_7" data-qid="q13" data-subkey="Employer benefits" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_7_2">
+            <input type="radio" id="q13_7_2" name="q13_7" data-qid="q13" data-subkey="Employer benefits" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Mortgage</th><td><label class="matrix-radio" for="q13_8_0">
+            <input type="radio" id="q13_8_0" name="q13_8" data-qid="q13" data-subkey="Mortgage" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_8_1">
+            <input type="radio" id="q13_8_1" name="q13_8" data-qid="q13" data-subkey="Mortgage" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_8_2">
+            <input type="radio" id="q13_8_2" name="q13_8" data-qid="q13" data-subkey="Mortgage" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Other debt</th><td><label class="matrix-radio" for="q13_9_0">
+            <input type="radio" id="q13_9_0" name="q13_9" data-qid="q13" data-subkey="Other debt" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_9_1">
+            <input type="radio" id="q13_9_1" name="q13_9" data-qid="q13" data-subkey="Other debt" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_9_2">
+            <input type="radio" id="q13_9_2" name="q13_9" data-qid="q13" data-subkey="Other debt" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Home equity</th><td><label class="matrix-radio" for="q13_10_0">
+            <input type="radio" id="q13_10_0" name="q13_10" data-qid="q13" data-subkey="Home equity" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_10_1">
+            <input type="radio" id="q13_10_1" name="q13_10" data-qid="q13" data-subkey="Home equity" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_10_2">
+            <input type="radio" id="q13_10_2" name="q13_10" data-qid="q13" data-subkey="Home equity" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Taxes</th><td><label class="matrix-radio" for="q13_11_0">
+            <input type="radio" id="q13_11_0" name="q13_11" data-qid="q13" data-subkey="Taxes" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_11_1">
+            <input type="radio" id="q13_11_1" name="q13_11" data-qid="q13" data-subkey="Taxes" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_11_2">
+            <input type="radio" id="q13_11_2" name="q13_11" data-qid="q13" data-subkey="Taxes" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Insurance</th><td><label class="matrix-radio" for="q13_12_0">
+            <input type="radio" id="q13_12_0" name="q13_12" data-qid="q13" data-subkey="Insurance" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_12_1">
+            <input type="radio" id="q13_12_1" name="q13_12" data-qid="q13" data-subkey="Insurance" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_12_2">
+            <input type="radio" id="q13_12_2" name="q13_12" data-qid="q13" data-subkey="Insurance" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Future Social Security</th><td><label class="matrix-radio" for="q13_13_0">
+            <input type="radio" id="q13_13_0" name="q13_13" data-qid="q13" data-subkey="Future Social Security" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_13_1">
+            <input type="radio" id="q13_13_1" name="q13_13" data-qid="q13" data-subkey="Future Social Security" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_13_2">
+            <input type="radio" id="q13_13_2" name="q13_13" data-qid="q13" data-subkey="Future Social Security" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Spouse&#x27;s finances</th><td><label class="matrix-radio" for="q13_14_0">
+            <input type="radio" id="q13_14_0" name="q13_14" data-qid="q13" data-subkey="Spouse&#x27;s finances" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_14_1">
+            <input type="radio" id="q13_14_1" name="q13_14" data-qid="q13" data-subkey="Spouse&#x27;s finances" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_14_2">
+            <input type="radio" id="q13_14_2" name="q13_14" data-qid="q13" data-subkey="Spouse&#x27;s finances" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Future major purchases</th><td><label class="matrix-radio" for="q13_15_0">
+            <input type="radio" id="q13_15_0" name="q13_15" data-qid="q13" data-subkey="Future major purchases" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_15_1">
+            <input type="radio" id="q13_15_1" name="q13_15" data-qid="q13" data-subkey="Future major purchases" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_15_2">
+            <input type="radio" id="q13_15_2" name="q13_15" data-qid="q13" data-subkey="Future major purchases" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Career/income trajectory</th><td><label class="matrix-radio" for="q13_16_0">
+            <input type="radio" id="q13_16_0" name="q13_16" data-qid="q13" data-subkey="Career/income trajectory" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_16_1">
+            <input type="radio" id="q13_16_1" name="q13_16" data-qid="q13" data-subkey="Career/income trajectory" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_16_2">
+            <input type="radio" id="q13_16_2" name="q13_16" data-qid="q13" data-subkey="Career/income trajectory" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Family plans</th><td><label class="matrix-radio" for="q13_17_0">
+            <input type="radio" id="q13_17_0" name="q13_17" data-qid="q13" data-subkey="Family plans" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_17_1">
+            <input type="radio" id="q13_17_1" name="q13_17" data-qid="q13" data-subkey="Family plans" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_17_2">
+            <input type="radio" id="q13_17_2" name="q13_17" data-qid="q13" data-subkey="Family plans" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr><tr><th>Estate planning</th><td><label class="matrix-radio" for="q13_18_0">
+            <input type="radio" id="q13_18_0" name="q13_18" data-qid="q13" data-subkey="Estate planning" value="Essential">
+            <span class="sr-only">Essential</span></label></td><td><label class="matrix-radio" for="q13_18_1">
+            <input type="radio" id="q13_18_1" name="q13_18" data-qid="q13" data-subkey="Estate planning" value="Useful">
+            <span class="sr-only">Useful</span></label></td><td><label class="matrix-radio" for="q13_18_2">
+            <input type="radio" id="q13_18_2" name="q13_18" data-qid="q13" data-subkey="Estate planning" value="Not important">
+            <span class="sr-only">Not important</span></label></td></tr></tbody></table></div>
+    </div>
+    <div class="question" data-question="q13b">
+      <label class="qprompt" for="q13b"><span class="qid">Q13B</span>Other areas Penny should understand:</label>
+      
+      <textarea id="q13b" data-qid="q13b" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q14">
+      <div class="qprompt"><span class="qid">Q14</span>Which question is more valuable to you?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q14_0">
+            <input type="radio" id="q14_0" name="q14" data-qid="q14" value="A. How are my investments performing?" >
+            <span>A. How are my investments performing?</span>
+          </label>
+          <label class="choice" for="q14_1">
+            <input type="radio" id="q14_1" name="q14" data-qid="q14" value="B. Given everything happening in my financial life, what should I change?" >
+            <span>B. Given everything happening in my financial life, what should I change?</span>
+          </label></div>
+      <textarea class="followup" data-qid="q14_why" rows="3" placeholder="Optional: explain your answer"></textarea>
+    </div>
+    <div class="question" data-question="q15">
+      <label class="qprompt" for="q15"><span class="qid">Q15</span>Imagine you have an additional $25,000 available tomorrow. List the possibilities you would personally consider, whether you want Penny to rank them, and what it would need to know before you&#x27;d trust that ranking.</label>
+      
+      <textarea id="q15" data-qid="q15" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q16">
+      <label class="qprompt" for="q16"><span class="qid">Q16</span>Would you want Penny to actively identify idle or suboptimally deployed money without you asking? What would a great recommendation look like?</label>
+      
+      <textarea id="q16" data-qid="q16" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>4. Investing</h2>
+        <p>Separate the investing you enjoy from the investing you just want handled well.</p>
+      </div>
+      
+    <div class="question" data-question="q17">
+      <label class="qprompt" for="q17"><span class="qid">Q17</span>What investment decisions do you actually want to make personally because you enjoy them?</label>
+      
+      <textarea id="q17" data-qid="q17" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q18">
+      <label class="qprompt" for="q18"><span class="qid">Q18</span>Which investment decisions would you happily delegate?</label>
+      
+      <textarea id="q18" data-qid="q18" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question rank-question" data-question="q19">
+      <div class="qprompt"><span class="qid">Q19</span>Rank how valuable these investment capabilities are.</div>
+      <div class="help">Use 1 for most valuable and 14 for least valuable. Use each number once.</div>
+      <div class="rank-list">
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Tell me whether my overall allocation makes sense." aria-label="Rank for Tell me whether my overall allocation makes sense."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Tell me whether my overall allocation makes sense.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Analyze all household accounts as one portfolio." aria-label="Rank for Analyze all household accounts as one portfolio."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Analyze all household accounts as one portfolio.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Identify concentration risks." aria-label="Rank for Identify concentration risks."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Identify concentration risks.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Find unnecessary fees." aria-label="Rank for Find unnecessary fees."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Find unnecessary fees.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Recommend where new contributions should go." aria-label="Rank for Recommend where new contributions should go."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Recommend where new contributions should go.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Tell me when I should rebalance." aria-label="Rank for Tell me when I should rebalance."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Tell me when I should rebalance.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Find ways to rebalance without creating unnecessary taxes." aria-label="Rank for Find ways to rebalance without creating unnecessary taxes."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Find ways to rebalance without creating unnecessary taxes.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Analyze tax lots before recommending taxable sales." aria-label="Rank for Analyze tax lots before recommending taxable sales."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Analyze tax lots before recommending taxable sales.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Optimize which assets live in which account types." aria-label="Rank for Optimize which assets live in which account types."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Optimize which assets live in which account types.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Identify tax-loss harvesting opportunities." aria-label="Rank for Identify tax-loss harvesting opportunities."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Identify tax-loss harvesting opportunities.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Tell me whether I&#x27;m taking enough/too much risk." aria-label="Rank for Tell me whether I&#x27;m taking enough/too much risk."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Tell me whether I&#x27;m taking enough/too much risk.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Tell me whether my investment decisions are consistent with my life goals." aria-label="Rank for Tell me whether my investment decisions are consistent with my life goals."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Tell me whether my investment decisions are consistent with my life goals.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Challenge me when I&#x27;m taking an unnecessarily speculative position." aria-label="Rank for Challenge me when I&#x27;m taking an unnecessarily speculative position."><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Challenge me when I&#x27;m taking an unnecessarily speculative position.</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q19" data-subkey="Something else" aria-label="Rank for Something else"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option></select>
+          <span>Something else</span>
+        </div></div>
+      <div class="rank-warning" id="q19_warning" role="status"></div>
+    </div>
+    <div class="question" data-question="q20">
+      <div class="qprompt"><span class="qid">Q20</span>How prescriptive should Penny be?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q20_0">
+            <input type="radio" id="q20_0" name="q20" data-qid="q20" value="A. Here&#x27;s something worth looking at." >
+            <span>A. Here&#x27;s something worth looking at.</span>
+          </label>
+          <label class="choice" for="q20_1">
+            <input type="radio" id="q20_1" name="q20" data-qid="q20" value="B. Here are your three reasonable choices." >
+            <span>B. Here are your three reasonable choices.</span>
+          </label>
+          <label class="choice" for="q20_2">
+            <input type="radio" id="q20_2" name="q20" data-qid="q20" value="C. I think option B is best. Here&#x27;s why." >
+            <span>C. I think option B is best. Here&#x27;s why.</span>
+          </label>
+          <label class="choice" for="q20_3">
+            <input type="radio" id="q20_3" name="q20" data-qid="q20" value="D. I recommend doing X, Y and Z. Approve when ready." >
+            <span>D. I recommend doing X, Y and Z. Approve when ready.</span>
+          </label>
+          <label class="choice" for="q20_4">
+            <input type="radio" id="q20_4" name="q20" data-qid="q20" value="E. Eventually execute approved strategies automatically." >
+            <span>E. Eventually execute approved strategies automatically.</span>
+          </label></div>
+      <textarea class="followup" data-qid="q20_why" rows="3" placeholder="Optional: explain your answer"></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>5. Life planning</h2>
+        <p>What should Penny help decide, not merely calculate?</p>
+      </div>
+      
+    <div class="question" data-question="q21">
+      <label class="qprompt" for="q21"><span class="qid">Q21</span>What major decisions over the next 5–10 years are likely to have meaningful financial consequences? Think beyond purchases: career, family, housing, lifestyle, time off, etc.</label>
+      
+      <textarea id="q21" data-qid="q21" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q22">
+      <div class="qprompt"><span class="qid">Q22</span>For a major decision like a house, what would you actually want Penny to answer?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q22_0">
+            <input type="checkbox" id="q22_0" data-qid="q22" value="Can I afford it?">
+            <span>Can I afford it?</span>
+          </label>
+          <label class="choice" for="q22_1">
+            <input type="checkbox" id="q22_1" data-qid="q22" value="What&#x27;s the maximum I could spend?">
+            <span>What&#x27;s the maximum I could spend?</span>
+          </label>
+          <label class="choice" for="q22_2">
+            <input type="checkbox" id="q22_2" data-qid="q22" value="What price is financially responsible?">
+            <span>What price is financially responsible?</span>
+          </label>
+          <label class="choice" for="q22_3">
+            <input type="checkbox" id="q22_3" data-qid="q22" value="How does it affect FI?">
+            <span>How does it affect FI?</span>
+          </label>
+          <label class="choice" for="q22_4">
+            <input type="checkbox" id="q22_4" data-qid="q22" value="What&#x27;s the opportunity cost?">
+            <span>What&#x27;s the opportunity cost?</span>
+          </label>
+          <label class="choice" for="q22_5">
+            <input type="checkbox" id="q22_5" data-qid="q22" value="What lifestyle sacrifices does it create?">
+            <span>What lifestyle sacrifices does it create?</span>
+          </label>
+          <label class="choice" for="q22_6">
+            <input type="checkbox" id="q22_6" data-qid="q22" value="How should I finance it?">
+            <span>How should I finance it?</span>
+          </label>
+          <label class="choice" for="q22_7">
+            <input type="checkbox" id="q22_7" data-qid="q22" value="What assets should fund the purchase?">
+            <span>What assets should fund the purchase?</span>
+          </label>
+          <label class="choice" for="q22_8">
+            <input type="checkbox" id="q22_8" data-qid="q22" value="What tax consequences does it create?">
+            <span>What tax consequences does it create?</span>
+          </label>
+          <label class="choice" for="q22_9">
+            <input type="checkbox" id="q22_9" data-qid="q22" value="Something else">
+            <span>Something else</span>
+          </label></div>
+    </div>
+    <div class="question" data-question="q23">
+      <div class="qprompt"><span class="qid">Q23</span>How valuable would this experience be: “Compare buying a $600k, $750k and $900k house. Optimize the recommendation around the life I told you I want.”</div>
+      <div class="scale-labels"><span>1 = not useful</span><span>10 = extremely valuable</span></div>
+      <div class="scale">
+          <label class="scale-choice" for="q23_1">
+            <input type="radio" id="q23_1" name="q23" data-qid="q23" value="1" >
+            <span>1</span>
+          </label>
+          <label class="scale-choice" for="q23_2">
+            <input type="radio" id="q23_2" name="q23" data-qid="q23" value="2" >
+            <span>2</span>
+          </label>
+          <label class="scale-choice" for="q23_3">
+            <input type="radio" id="q23_3" name="q23" data-qid="q23" value="3" >
+            <span>3</span>
+          </label>
+          <label class="scale-choice" for="q23_4">
+            <input type="radio" id="q23_4" name="q23" data-qid="q23" value="4" >
+            <span>4</span>
+          </label>
+          <label class="scale-choice" for="q23_5">
+            <input type="radio" id="q23_5" name="q23" data-qid="q23" value="5" >
+            <span>5</span>
+          </label>
+          <label class="scale-choice" for="q23_6">
+            <input type="radio" id="q23_6" name="q23" data-qid="q23" value="6" >
+            <span>6</span>
+          </label>
+          <label class="scale-choice" for="q23_7">
+            <input type="radio" id="q23_7" name="q23" data-qid="q23" value="7" >
+            <span>7</span>
+          </label>
+          <label class="scale-choice" for="q23_8">
+            <input type="radio" id="q23_8" name="q23" data-qid="q23" value="8" >
+            <span>8</span>
+          </label>
+          <label class="scale-choice" for="q23_9">
+            <input type="radio" id="q23_9" name="q23" data-qid="q23" value="9" >
+            <span>9</span>
+          </label>
+          <label class="scale-choice" for="q23_10">
+            <input type="radio" id="q23_10" name="q23" data-qid="q23" value="10" >
+            <span>10</span>
+          </label></div>
+      <textarea class="followup" data-qid="q23_why" rows="3" placeholder="Why did you choose that number?"></textarea>
+    </div>
+    <div class="question" data-question="q24">
+      <label class="qprompt" for="q24"><span class="qid">Q24</span>What other decisions would you want to model this way?</label>
+      
+      <textarea id="q24" data-qid="q24" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q25">
+      <label class="qprompt" for="q25"><span class="qid">Q25</span>Would you want Penny to proactively say, “You can afford this, but I don&#x27;t think you should do it based on the goals you&#x27;ve told me matter most”? How comfortable are you with Penny challenging your decisions?</label>
+      
+      <textarea id="q25" data-qid="q25" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>6. What should Penny know about me?</h2>
+        <p>Money advice gets better when it understands the life around the money.</p>
+      </div>
+      
+    <div class="question" data-question="q26">
+      <div class="qprompt"><span class="qid">Q26</span>Besides financial data, what should Penny understand to give genuinely good advice?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q26_0">
+            <input type="checkbox" id="q26_0" data-qid="q26" value="What I value">
+            <span>What I value</span>
+          </label>
+          <label class="choice" for="q26_1">
+            <input type="checkbox" id="q26_1" data-qid="q26" value="Career satisfaction">
+            <span>Career satisfaction</span>
+          </label>
+          <label class="choice" for="q26_2">
+            <input type="checkbox" id="q26_2" data-qid="q26" value="Desire to retire early">
+            <span>Desire to retire early</span>
+          </label>
+          <label class="choice" for="q26_3">
+            <input type="checkbox" id="q26_3" data-qid="q26" value="Family goals">
+            <span>Family goals</span>
+          </label>
+          <label class="choice" for="q26_4">
+            <input type="checkbox" id="q26_4" data-qid="q26" value="Risk tolerance">
+            <span>Risk tolerance</span>
+          </label>
+          <label class="choice" for="q26_5">
+            <input type="checkbox" id="q26_5" data-qid="q26" value="Desired lifestyle">
+            <span>Desired lifestyle</span>
+          </label>
+          <label class="choice" for="q26_6">
+            <input type="checkbox" id="q26_6" data-qid="q26" value="Housing preferences">
+            <span>Housing preferences</span>
+          </label>
+          <label class="choice" for="q26_7">
+            <input type="checkbox" id="q26_7" data-qid="q26" value="Desire for travel">
+            <span>Desire for travel</span>
+          </label>
+          <label class="choice" for="q26_8">
+            <input type="checkbox" id="q26_8" data-qid="q26" value="How important liquidity feels to me">
+            <span>How important liquidity feels to me</span>
+          </label>
+          <label class="choice" for="q26_9">
+            <input type="checkbox" id="q26_9" data-qid="q26" value="How much financial uncertainty stresses me">
+            <span>How much financial uncertainty stresses me</span>
+          </label>
+          <label class="choice" for="q26_10">
+            <input type="checkbox" id="q26_10" data-qid="q26" value="How much I enjoy managing investments">
+            <span>How much I enjoy managing investments</span>
+          </label>
+          <label class="choice" for="q26_11">
+            <input type="checkbox" id="q26_11" data-qid="q26" value="Values around giving/family">
+            <span>Values around giving/family</span>
+          </label>
+          <label class="choice" for="q26_12">
+            <input type="checkbox" id="q26_12" data-qid="q26" value="Something else">
+            <span>Something else</span>
+          </label></div>
+    </div>
+    <div class="question" data-question="q27">
+      <label class="qprompt" for="q27"><span class="qid">Q27</span>Which of those things should Penny learn once, and which might change enough that Penny should periodically ask again?</label>
+      
+      <textarea id="q27" data-qid="q27" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q28">
+      <label class="qprompt" for="q28"><span class="qid">Q28</span>Would you want Penny to remember statements like “I&#x27;d rather work two extra years than compromise substantially on our house” or “Being able to leave a job I dislike is more important than maximizing lifetime wealth”? Would those preferences make recommendations meaningfully better?</label>
+      
+      <textarea id="q28" data-qid="q28" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>7. The home screen test</h2>
+        <p>Think about the actual habit, not the idealized one.</p>
+      </div>
+      
+    <div class="question rank-question" data-question="q29">
+      <div class="qprompt"><span class="qid">Q29</span>Rank what you&#x27;d most want to see first when you open Penny on a random Tuesday morning.</div>
+      <div class="help">Use 1 for what you&#x27;d most want to see and 11 for least. Use each number once.</div>
+      <div class="rank-list">
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Whether I&#x27;m on track" aria-label="Rank for Whether I&#x27;m on track"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Whether I&#x27;m on track</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Current net worth" aria-label="Rank for Current net worth"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Current net worth</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="FI date/range" aria-label="Rank for FI date/range"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>FI date/range</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Progress toward major goals" aria-label="Rank for Progress toward major goals"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Progress toward major goals</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="One recommended action" aria-label="Rank for One recommended action"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>One recommended action</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Opportunities Penny found" aria-label="Rank for Opportunities Penny found"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Opportunities Penny found</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Risks Penny found" aria-label="Rank for Risks Penny found"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Risks Penny found</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Portfolio performance" aria-label="Rank for Portfolio performance"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Portfolio performance</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Recent spending" aria-label="Rank for Recent spending"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Recent spending</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Upcoming decisions" aria-label="Rank for Upcoming decisions"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Upcoming decisions</span>
+        </div>
+        <div class="rank-row">
+          <select data-qid="q29" data-subkey="Nothing unless Penny needs my attention" aria-label="Rank for Nothing unless Penny needs my attention"><option value="">—</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option></select>
+          <span>Nothing unless Penny needs my attention</span>
+        </div></div>
+      <div class="rank-warning" id="q29_warning" role="status"></div>
+    </div>
+    <div class="question" data-question="q30">
+      <label class="qprompt" for="q30"><span class="qid">Q30</span>Which feels more valuable: a dashboard you regularly inspect, or an assistant that monitors things and only brings you in when something deserves attention? Why?</label>
+      
+      <textarea id="q30" data-qid="q30" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q31">
+      <div class="qprompt"><span class="qid">Q31</span>How frequently would you genuinely want to interact with Penny if it were working perfectly?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q31_0">
+            <input type="radio" id="q31_0" name="q31" data-qid="q31" value="Daily" >
+            <span>Daily</span>
+          </label>
+          <label class="choice" for="q31_1">
+            <input type="radio" id="q31_1" name="q31" data-qid="q31" value="Weekly" >
+            <span>Weekly</span>
+          </label>
+          <label class="choice" for="q31_2">
+            <input type="radio" id="q31_2" name="q31" data-qid="q31" value="Monthly" >
+            <span>Monthly</span>
+          </label>
+          <label class="choice" for="q31_3">
+            <input type="radio" id="q31_3" name="q31" data-qid="q31" value="Quarterly" >
+            <span>Quarterly</span>
+          </label>
+          <label class="choice" for="q31_4">
+            <input type="radio" id="q31_4" name="q31" data-qid="q31" value="Primarily when decisions arise" >
+            <span>Primarily when decisions arise</span>
+          </label></div>
+      
+    </div>
+    <div class="question" data-question="q32">
+      <label class="qprompt" for="q32"><span class="qid">Q32</span>What event should cause Penny to proactively contact you?</label>
+      
+      <textarea id="q32" data-qid="q32" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>8. Trust and explanation</h2>
+        <p>What earns the right to influence your behavior?</p>
+      </div>
+      
+    <div class="question" data-question="q33">
+      <label class="qprompt" for="q33"><span class="qid">Q33</span>What would Penny need to show before you would change your financial behavior based on its recommendation?</label>
+      
+      <textarea id="q33" data-qid="q33" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q34">
+      <div class="qprompt"><span class="qid">Q34</span>How much explanation do you personally want by default?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q34_0">
+            <input type="radio" id="q34_0" name="q34" data-qid="q34" value="Just tell me what to do" >
+            <span>Just tell me what to do</span>
+          </label>
+          <label class="choice" for="q34_1">
+            <input type="radio" id="q34_1" name="q34" data-qid="q34" value="Recommendation + one-sentence reason" >
+            <span>Recommendation + one-sentence reason</span>
+          </label>
+          <label class="choice" for="q34_2">
+            <input type="radio" id="q34_2" name="q34" data-qid="q34" value="Recommendation + concise explanation" >
+            <span>Recommendation + concise explanation</span>
+          </label>
+          <label class="choice" for="q34_3">
+            <input type="radio" id="q34_3" name="q34" data-qid="q34" value="Full analysis" >
+            <span>Full analysis</span>
+          </label>
+          <label class="choice" for="q34_4">
+            <input type="radio" id="q34_4" name="q34" data-qid="q34" value="Concise by default, full analysis available on demand" >
+            <span>Concise by default, full analysis available on demand</span>
+          </label></div>
+      
+    </div>
+    <div class="question" data-question="q35">
+      <label class="qprompt" for="q35"><span class="qid">Q35</span>Which recommendations would you require especially strong evidence for?</label>
+      
+      <textarea id="q35" data-qid="q35" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q36">
+      <label class="qprompt" for="q36"><span class="qid">Q36</span>Which actions, if any, would you eventually allow Penny to execute after approval?</label>
+      
+      <textarea id="q36" data-qid="q36" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q37">
+      <label class="qprompt" for="q37"><span class="qid">Q37</span>Are there actions you would never allow software to execute regardless of trust?</label>
+      
+      <textarea id="q37" data-qid="q37" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <h2>9. What actually makes Penny valuable?</h2>
+        <p>Force the product down to what truly matters.</p>
+      </div>
+      
+    <div class="question" data-question="q38">
+      <div class="qprompt"><span class="qid">Q38</span>Choose the three outcomes you&#x27;d pay the most for.</div>
+      <div class="help">Please choose your top three.</div>
+      <div class="choices">
+          <label class="choice" for="q38_0">
+            <input type="checkbox" id="q38_0" data-qid="q38" value="Grow wealth faster">
+            <span>Grow wealth faster</span>
+          </label>
+          <label class="choice" for="q38_1">
+            <input type="checkbox" id="q38_1" data-qid="q38" value="Retire earlier">
+            <span>Retire earlier</span>
+          </label>
+          <label class="choice" for="q38_2">
+            <input type="checkbox" id="q38_2" data-qid="q38" value="Avoid expensive mistakes">
+            <span>Avoid expensive mistakes</span>
+          </label>
+          <label class="choice" for="q38_3">
+            <input type="checkbox" id="q38_3" data-qid="q38" value="Save taxes">
+            <span>Save taxes</span>
+          </label>
+          <label class="choice" for="q38_4">
+            <input type="checkbox" id="q38_4" data-qid="q38" value="Make better investment decisions">
+            <span>Make better investment decisions</span>
+          </label>
+          <label class="choice" for="q38_5">
+            <input type="checkbox" id="q38_5" data-qid="q38" value="Make major life decisions confidently">
+            <span>Make major life decisions confidently</span>
+          </label>
+          <label class="choice" for="q38_6">
+            <input type="checkbox" id="q38_6" data-qid="q38" value="Spend less time thinking about finances">
+            <span>Spend less time thinking about finances</span>
+          </label>
+          <label class="choice" for="q38_7">
+            <input type="checkbox" id="q38_7" data-qid="q38" value="Feel reassured I&#x27;m doing the right things">
+            <span>Feel reassured I&#x27;m doing the right things</span>
+          </label>
+          <label class="choice" for="q38_8">
+            <input type="checkbox" id="q38_8" data-qid="q38" value="Discover opportunities I wouldn&#x27;t have noticed">
+            <span>Discover opportunities I wouldn&#x27;t have noticed</span>
+          </label>
+          <label class="choice" for="q38_9">
+            <input type="checkbox" id="q38_9" data-qid="q38" value="Coordinate our household finances">
+            <span>Coordinate our household finances</span>
+          </label>
+          <label class="choice" for="q38_10">
+            <input type="checkbox" id="q38_10" data-qid="q38" value="Other">
+            <span>Other</span>
+          </label></div>
+    </div>
+    <div class="question" data-question="q39">
+      <div class="qprompt"><span class="qid">Q39</span>Which promise resonates most?</div>
+      
+      <div class="choices">
+          <label class="choice" for="q39_0">
+            <input type="radio" id="q39_0" name="q39" data-qid="q39" value="A. Build wealth without becoming a financial expert." >
+            <span>A. Build wealth without becoming a financial expert.</span>
+          </label>
+          <label class="choice" for="q39_1">
+            <input type="radio" id="q39_1" name="q39" data-qid="q39" value="B. Know what to do next with your money." >
+            <span>B. Know what to do next with your money.</span>
+          </label>
+          <label class="choice" for="q39_2">
+            <input type="radio" id="q39_2" name="q39" data-qid="q39" value="C. Make life&#x27;s big decisions with your financial future in view." >
+            <span>C. Make life&#x27;s big decisions with your financial future in view.</span>
+          </label>
+          <label class="choice" for="q39_3">
+            <input type="radio" id="q39_3" name="q39" data-qid="q39" value="D. Your financial plan, always looking out for you." >
+            <span>D. Your financial plan, always looking out for you.</span>
+          </label>
+          <label class="choice" for="q39_4">
+            <input type="radio" id="q39_4" name="q39" data-qid="q39" value="E. Make the most of every dollar you earn." >
+            <span>E. Make the most of every dollar you earn.</span>
+          </label>
+          <label class="choice" for="q39_5">
+            <input type="radio" id="q39_5" name="q39" data-qid="q39" value="F. None of these." >
+            <span>F. None of these.</span>
+          </label></div>
+      <textarea class="followup" data-qid="q39_why" rows="3" placeholder="Optional: explain your answer"></textarea>
+    </div>
+    <div class="question" data-question="q40">
+      <label class="qprompt" for="q40"><span class="qid">Q40</span>If Penny worked perfectly, what would it do that you cannot easily accomplish today using your current combination of financial apps, spreadsheets, research, ChatGPT, and your own judgment?</label>
+      
+      <textarea id="q40" data-qid="q40" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q41">
+      <label class="qprompt" for="q41"><span class="qid">Q41</span>What&#x27;s the first moment during onboarding that would make you think, “Okay, this is actually valuable”?</label>
+      
+      <textarea id="q41" data-qid="q41" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q42">
+      <label class="qprompt" for="q42"><span class="qid">Q42</span>What&#x27;s the recurring experience that would make you still pay for Penny two years later?</label>
+      
+      <textarea id="q42" data-qid="q42" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q43">
+      <label class="qprompt" for="q43"><span class="qid">Q43</span>If Penny saved you meaningful time, improved decisions, and gave you confidence that your entire financial life was optimized appropriately, what would you realistically pay per month? Why?</label>
+      
+      <textarea id="q43" data-qid="q43" rows="4"  placeholder=""></textarea>
+    </div>
+    <div class="question" data-question="q44">
+      <label class="qprompt" for="q44"><span class="qid">Q44</span>Final constraint exercise: Penny can only do THREE things exceptionally well in V1. What are they?</label>
+      
+      <textarea id="q44" data-qid="q44" rows="4"  placeholder=""></textarea>
+    </div>
+    </section>
+
+  <div class="footer-card">
+    <h2>Finish & export</h2>
+    <p>Review anything you want to change, then download your responses. The file contains only what you entered into this survey.</p>
+    <div class="actions">
+      <button class="primary" id="download_btn" type="button">Download JSON</button>
+      <button class="secondary" id="save_btn" type="button">Save on this device</button>
+      <button class="secondary" id="reset_btn" type="button">Clear my answers</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+
+<script>
+const SURVEY = {
+  title: "Penny \u2014 Everyday Wealth Builder Survey",
+  icp: "Everyday Wealth Builder",
+  version: "1.0",
+  filenamePrefix: "penny_everyday_wealth_builder",
+  questionPrompts: {"q1": "Finish this sentence without using financial terminology: I want money to eventually give me the ability to…", "q2": "Rank what matters most to you financially.", "q3": "What does “financial independence” actually mean to you?", "q4": "What age would you like work to become optional?", "q5": "How important is maximizing wealth versus enjoying more money today? Where do you naturally fall on that spectrum?", "q6": "Think about the last year. What are the five biggest financial decisions you've had to think about?", "q7": "Which decisions required the most research, spreadsheets, ChatGPT conversations, mental energy, or second-guessing?", "q8": "What financial questions do you repeatedly revisit because you're never fully satisfied with the answer?", "q9": "What parts of your finances do you feel extremely confident managing yourself?", "q10": "What parts do you understand but frankly don't want to spend time managing?", "q11": "What areas do you suspect you could be doing better in, even if nothing is obviously wrong?", "q12": "Have you ever thought, “I'm probably leaving money on the table somewhere”? If so, where?", "q13": "If Penny could continuously evaluate the household, which areas should it understand?", "q13b": "Other areas Penny should understand:", "q14": "Which question is more valuable to you?", "q15": "Imagine you have an additional $25,000 available tomorrow. List the possibilities you would personally consider, whether you want Penny to rank them, and what it would need to know before you'd trust that ranking.", "q16": "Would you want Penny to actively identify idle or suboptimally deployed money without you asking? What would a great recommendation look like?", "q17": "What investment decisions do you actually want to make personally because you enjoy them?", "q18": "Which investment decisions would you happily delegate?", "q19": "Rank how valuable these investment capabilities are.", "q20": "How prescriptive should Penny be?", "q21": "What major decisions over the next 5–10 years are likely to have meaningful financial consequences? Think beyond purchases: career, family, housing, lifestyle, time off, etc.", "q22": "For a major decision like a house, what would you actually want Penny to answer?", "q23": "How valuable would this experience be: “Compare buying a $600k, $750k and $900k house. Optimize the recommendation around the life I told you I want.”", "q24": "What other decisions would you want to model this way?", "q25": "Would you want Penny to proactively say, “You can afford this, but I don't think you should do it based on the goals you've told me matter most”? How comfortable are you with Penny challenging your decisions?", "q26": "Besides financial data, what should Penny understand to give genuinely good advice?", "q27": "Which of those things should Penny learn once, and which might change enough that Penny should periodically ask again?", "q28": "Would you want Penny to remember statements like “I'd rather work two extra years than compromise substantially on our house” or “Being able to leave a job I dislike is more important than maximizing lifetime wealth”? Would those preferences make recommendations meaningfully better?", "q29": "Rank what you'd most want to see first when you open Penny on a random Tuesday morning.", "q30": "Which feels more valuable: a dashboard you regularly inspect, or an assistant that monitors things and only brings you in when something deserves attention? Why?", "q31": "How frequently would you genuinely want to interact with Penny if it were working perfectly?", "q32": "What event should cause Penny to proactively contact you?", "q33": "What would Penny need to show before you would change your financial behavior based on its recommendation?", "q34": "How much explanation do you personally want by default?", "q35": "Which recommendations would you require especially strong evidence for?", "q36": "Which actions, if any, would you eventually allow Penny to execute after approval?", "q37": "Are there actions you would never allow software to execute regardless of trust?", "q38": "Choose the three outcomes you'd pay the most for.", "q39": "Which promise resonates most?", "q40": "If Penny worked perfectly, what would it do that you cannot easily accomplish today using your current combination of financial apps, spreadsheets, research, ChatGPT, and your own judgment?", "q41": "What's the first moment during onboarding that would make you think, “Okay, this is actually valuable”?", "q42": "What's the recurring experience that would make you still pay for Penny two years later?", "q43": "If Penny saved you meaningful time, improved decisions, and gave you confidence that your entire financial life was optimized appropriately, what would you realistically pay per month? Why?", "q44": "Final constraint exercise: Penny can only do THREE things exceptionally well in V1. What are they?"}
+};
+const STORAGE_KEY = "penny-survey-" + SURVEY.icp.replace(/[^a-z0-9]+/gi,"-").toLowerCase() + "-v1";
+
+function collectAnswers() {
+  const answers = {};
+  const els = Array.from(document.querySelectorAll("[data-qid]"));
+  const grouped = new Map();
+  for (const el of els) {
+    const qid = el.dataset.qid;
+    if (!grouped.has(qid)) grouped.set(qid, []);
+    grouped.get(qid).push(el);
+  }
+  for (const [qid, items] of grouped.entries()) {
+    const hasSubkeys = items.some(x => x.dataset.subkey);
+    if (hasSubkeys) {
+      const obj = {};
+      const subgroups = new Map();
+      for (const el of items) {
+        const k = el.dataset.subkey || "value";
+        if (!subgroups.has(k)) subgroups.set(k, []);
+        subgroups.get(k).push(el);
+      }
+      for (const [k, group] of subgroups.entries()) {
+        const radios = group.filter(x => x.type === "radio");
+        if (radios.length) {
+          const checked = radios.find(x => x.checked);
+          obj[k] = checked ? checked.value : "";
+        } else {
+          const el = group[0];
+          obj[k] = el.value || "";
+        }
+      }
+      answers[qid] = obj;
+      continue;
+    }
+    const first = items[0];
+    if (first.type === "checkbox") {
+      answers[qid] = items.filter(x => x.checked).map(x => x.value);
+    } else if (first.type === "radio") {
+      const checked = items.find(x => x.checked);
+      answers[qid] = checked ? checked.value : "";
+    } else {
+      answers[qid] = first.value || "";
+    }
+  }
+  return answers;
+}
+
+function payload() {
+  return {
+    meta: {
+      surveyTitle: SURVEY.title,
+      icp: SURVEY.icp,
+      surveyVersion: SURVEY.version,
+      respondentName: document.getElementById("respondent_name").value.trim(),
+      respondentNote: document.getElementById("respondent_note").value.trim(),
+      completedAt: new Date().toISOString()
+    },
+    questions: SURVEY.questionPrompts,
+    answers: collectAnswers()
+  };
+}
+
+function saveLocal(showStatus=true) {
+  const data = payload();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (showStatus) setStatus("Saved on this device.");
+}
+
+function restoreLocal() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    document.getElementById("respondent_name").value = data.meta?.respondentName || "";
+    document.getElementById("respondent_note").value = data.meta?.respondentNote || "";
+    const ans = data.answers || {};
+    for (const [qid, value] of Object.entries(ans)) {
+      const els = Array.from(document.querySelectorAll(`[data-qid="${CSS.escape(qid)}"]`));
+      if (!els.length) continue;
+      const hasSubkeys = els.some(x => x.dataset.subkey);
+      if (hasSubkeys && value && typeof value === "object") {
+        for (const el of els) {
+          const subv = value[el.dataset.subkey];
+          if (el.type === "radio") el.checked = (el.value === subv);
+          else if (subv !== undefined) el.value = subv;
+        }
+      } else if (Array.isArray(value)) {
+        for (const el of els) el.checked = value.includes(el.value);
+      } else if (els[0].type === "radio") {
+        for (const el of els) el.checked = (el.value === value);
+      } else {
+        els[0].value = value ?? "";
+      }
+    }
+    setStatus("Restored your saved answers from this device.");
+  } catch (e) {}
+}
+
+function validateRanks() {
+  let ok = true;
+  document.querySelectorAll(".rank-question").forEach(block => {
+    const selects = Array.from(block.querySelectorAll("select[data-qid]"));
+    const chosen = selects.map(s => s.value).filter(Boolean);
+    const dupes = chosen.filter((v,i,a) => a.indexOf(v) !== i);
+    const warning = block.querySelector(".rank-warning");
+    if (dupes.length) {
+      warning.textContent = "Use each rank number only once.";
+      ok = false;
+    } else {
+      warning.textContent = "";
+    }
+  });
+  return ok;
+}
+
+function completion() {
+  const questionBlocks = Array.from(document.querySelectorAll(".question"));
+  let answered = 0;
+  for (const block of questionBlocks) {
+    const ids = Array.from(new Set(Array.from(block.querySelectorAll("[data-qid]")).map(x => x.dataset.qid)));
+    let blockAnswered = false;
+    for (const qid of ids) {
+      const v = collectAnswers()[qid];
+      if (Array.isArray(v) && v.length) blockAnswered = true;
+      else if (v && typeof v === "object" && Object.values(v).some(Boolean)) blockAnswered = true;
+      else if (typeof v === "string" && v.trim()) blockAnswered = true;
+    }
+    if (blockAnswered) answered++;
+  }
+  const pct = questionBlocks.length ? Math.round(answered/questionBlocks.length*100) : 0;
+  document.getElementById("progress_bar").style.width = pct + "%";
+  document.getElementById("progress_text").textContent = `${pct}% complete · ${answered}/${questionBlocks.length} questions started`;
+}
+
+function setStatus(msg) {
+  const el = document.getElementById("status");
+  el.textContent = msg;
+}
+
+document.addEventListener("input", () => {
+  completion(); validateRanks();
+  window.clearTimeout(window.__autosave);
+  window.__autosave = window.setTimeout(() => saveLocal(false), 350);
+});
+document.addEventListener("change", () => {
+  completion(); validateRanks(); saveLocal(false);
+});
+
+document.getElementById("save_btn").addEventListener("click", () => saveLocal(true));
+
+document.getElementById("download_btn").addEventListener("click", () => {
+  if (!validateRanks()) {
+    setStatus("Please fix duplicate ranking numbers before downloading.");
+    document.querySelector(".rank-warning:not(:empty)")?.scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+  const data = payload();
+  const name = (data.meta.respondentName || "response").replace(/[^a-z0-9_-]+/gi,"-").toLowerCase();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${SURVEY.filenamePrefix}_${name}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  saveLocal(false);
+  setStatus("JSON downloaded. Send that file back to the person who shared this survey with you.");
+});
+
+document.getElementById("reset_btn").addEventListener("click", () => {
+  if (!confirm("Clear every answer saved in this survey on this device?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll("textarea,input,select").forEach(el => {
+    if (el.type === "radio" || el.type === "checkbox") el.checked = false;
+    else el.value = "";
+  });
+  completion(); validateRanks(); setStatus("Answers cleared.");
+});
+
+restoreLocal();
+completion();
+validateRanks();
+</script>
+</body>
+</html>
